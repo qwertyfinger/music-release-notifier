@@ -1,0 +1,73 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        applicationId "com.qwertyfinger.musicreleasestracker"
+        minSdkVersion 14
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        debug {
+            debuggable true
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'allclasses-frame.html'
+        exclude 'index.html'
+        exclude 'package-list'
+        exclude 'deprecated-list.html'
+        exclude 'serialized-form.html'
+        exclude 'stylesheet.css'
+        exclude 'help-doc.html'
+        exclude 'overview-tree.html'
+        exclude 'overview-frame.html'
+        exclude 'allclasses-noframe.html'
+        exclude 'constant-values.html'
+        exclude 'overview-summary.html'
+        exclude 'index-all.html'
+        exclude '.idea/checkstyle-idea.xml'
+        exclude '.idea/compiler.xml'
+        exclude '.idea/copyright/profiles_settings.xml'
+        exclude '.idea/misc.xml'
+        exclude '.idea/modules.xml'
+        exclude '.idea/vcs.xml'
+        exclude '.idea/workspace.xml'
+        exclude '.idea/uiDesigner.xml'
+    }
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'de.greenrobot:eventbus:2.4.0'
+    compile 'se.emilsjolander:stickylistheaders:2.6.0'
+    compile 'com.birbit:android-priority-jobqueue:1.3'
+    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
+    compile 'com.android.support:support-v4:22.0.0'
+}
