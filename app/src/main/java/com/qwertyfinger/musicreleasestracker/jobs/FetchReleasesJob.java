@@ -32,17 +32,17 @@ public class FetchReleasesJob extends Job{
     public void onRun() throws Throwable {
         DatabaseHandler db = DatabaseHandler.getInstance(context);
 
-        if (db.getArtistsCount() == 0) {
+        if (db.getArtistsCount() == 0)
             EventBus.getDefault().post(new NoArtistsEvent());
-        }
-
-        if (db.getReleasesCount() == 0) {
-            EventBus.getDefault().post(new NoReleasesEvent());
-        }
 
         else {
-            List<Release> releases = db.getAllReleases();
-            EventBus.getDefault().post(new ReleasesFetchedEvent(releases));
+            if (db.getReleasesCount() == 0)
+                EventBus.getDefault().post(new NoReleasesEvent());
+
+            else {
+                List<Release> releases = db.getAllReleases();
+                EventBus.getDefault().post(new ReleasesFetchedEvent(releases));
+            }
         }
     }
 

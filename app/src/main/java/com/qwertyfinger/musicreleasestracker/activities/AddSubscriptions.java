@@ -54,7 +54,7 @@ public class AddSubscriptions extends ActionBarActivity{
         spinner = (ProgressBar)findViewById(R.id.progressBar);
         spinner.setVisibility(View.GONE);
 
-        noResult = (TextView) findViewById(R.id.noresult);
+        noResult = (TextView) findViewById(R.id.noResult);
         noResult.setVisibility(View.GONE);
 
         ActionBar actionBar = getSupportActionBar();
@@ -170,7 +170,7 @@ public class AddSubscriptions extends ActionBarActivity{
     @Override
     protected void onStop(){
         super.onStop();
-        if (artistAdded == true)
+        if (artistAdded)
             jobManager.addJobInBackground(new RefreshReleasesJob(this, Constants.AFTER_ADDING_REFRESH));
     }
 

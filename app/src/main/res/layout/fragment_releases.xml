@@ -10,9 +10,18 @@
         android:layout_height="match_parent"
         android:id="@+id/list"/>
 
-    <TextView android:id="@id/android:empty"
+    <TextView android:id="@+id/noReleases"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="You have no upcoming releases" />
+        android:text="You have no upcoming releases"
+        android:gravity="center"
+        android:textSize="20sp"/>
+
+    <TextView android:id="@+id/noArtists"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="You have no subscriptions"
+        android:gravity="center"
+        android:textSize="20sp"/>
 
 </RelativeLayout>

@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:id="@+id/list"/>
 
-    <TextView android:id="@+id/noresult"
+    <TextView android:id="@+id/noResult"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="Sorry, couldn't find anything"
