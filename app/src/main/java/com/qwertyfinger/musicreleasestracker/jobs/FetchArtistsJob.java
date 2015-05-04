@@ -6,21 +6,20 @@ import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasestracker.Constants;
 import com.qwertyfinger.musicreleasestracker.database.DatabaseHandler;
+import com.qwertyfinger.musicreleasestracker.events.ArtistsFetchedEvent;
 import com.qwertyfinger.musicreleasestracker.events.NoArtistsEvent;
-import com.qwertyfinger.musicreleasestracker.events.NoReleasesEvent;
-import com.qwertyfinger.musicreleasestracker.events.ReleasesFetchedEvent;
-import com.qwertyfinger.musicreleasestracker.misc.Release;
+import com.qwertyfinger.musicreleasestracker.misc.Artist;
 
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class FetchReleasesJob extends Job{
+public class FetchArtistsJob extends Job {
 
     private final Context context;
 
-    public FetchReleasesJob(Context context) {
-        super(new Params(Constants.JOB_PRIORITY_HIGH).groupBy(Constants.JOB_GROUP_DATABASE));
+    public FetchArtistsJob(Context context) {
+        super(new Params(Constants.JOB_PRIORITY_MEDIUM).groupBy(Constants.JOB_GROUP_DATABASE));
         this.context = context;
     }
 
@@ -37,13 +36,8 @@ public class FetchReleasesJob extends Job{
             EventBus.getDefault().post(new NoArtistsEvent());
 
         else {
-            if (db.getReleasesCount() == 0)
-                EventBus.getDefault().post(new NoReleasesEvent());
-
-            else {
-                List<Release> releases = db.getAllReleases();
-                EventBus.getDefault().post(new ReleasesFetchedEvent(releases));
-            }
+            List<Artist> artists = db.getAllArtists();
+            EventBus.getDefault().post(new ArtistsFetchedEvent(artists));
         }
     }
 

@@ -6,21 +6,16 @@ import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasestracker.Constants;
 import com.qwertyfinger.musicreleasestracker.database.DatabaseHandler;
-import com.qwertyfinger.musicreleasestracker.events.ArtistAddedEvent;
-import com.qwertyfinger.musicreleasestracker.misc.Artist;
-import com.qwertyfinger.musicreleasestracker.misc.SearchResult;
 
-import de.greenrobot.event.EventBus;
-
-public class AddArtistJob extends Job{
+public class DeleteArtistJob extends Job {
 
     private final Context context;
-    private final SearchResult searchResult;
+    private final String artistId;
 
-    public AddArtistJob(Context c, SearchResult searchResult) {
+    public DeleteArtistJob(Context c, String  artistId) {
         super(new Params(Constants.JOB_PRIORITY_LOW).groupBy(Constants.JOB_GROUP_DATABASE));
         this.context = c;
-        this.searchResult = searchResult;
+        this.artistId = artistId;
     }
 
     @Override
@@ -31,9 +26,8 @@ public class AddArtistJob extends Job{
     @Override
     public void onRun() throws Throwable {
         DatabaseHandler db = DatabaseHandler.getInstance(context);
-        Artist artist = new Artist(searchResult.getMbid(), searchResult.getName(), searchResult. getImageUrl());
-        db.addArtist(artist);
-        EventBus.getDefault().post(new ArtistAddedEvent(artist));
+        db.deleteArtist(artistId);
+//        EventBus.getDefault().post(new ArtistAddedEvent(artist));
     }
 
     @Override

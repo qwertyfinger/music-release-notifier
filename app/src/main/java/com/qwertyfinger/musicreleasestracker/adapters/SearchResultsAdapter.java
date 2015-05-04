@@ -1,6 +1,7 @@
 package com.qwertyfinger.musicreleasestracker.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,6 +67,7 @@ public class SearchResultsAdapter extends ArrayAdapter<SearchResult> {
         try {
             Picasso.with(context)
                     .load(searchResult.getImageUrl())
+                    .config(Bitmap.Config.RGB_565)
                     .error(R.drawable.no_image)
                     .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
                     .centerCrop()
@@ -74,7 +76,7 @@ public class SearchResultsAdapter extends ArrayAdapter<SearchResult> {
         catch (java.lang.IllegalArgumentException e){
             Picasso.with(context)
                     .load(R.drawable.no_image)
-                    .error(R.drawable.no_image)
+                    .config(Bitmap.Config.RGB_565)
                     .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
                     .centerCrop()
                     .tag(context)

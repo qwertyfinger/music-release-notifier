@@ -6,6 +6,7 @@ import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasestracker.App;
+import com.qwertyfinger.musicreleasestracker.Constants;
 import com.qwertyfinger.musicreleasestracker.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasestracker.events.ArtistDeletedEvent;
 import com.qwertyfinger.musicreleasestracker.events.NoArtistsEvent;
@@ -18,7 +19,7 @@ public class EmptyArtistsJob extends Job {
     private JobManager jobManager;
 
     public EmptyArtistsJob(Context context) {
-        super(new Params(1).groupBy("database"));
+        super(new Params(Constants.JOB_PRIORITY_HIGH).groupBy(Constants.JOB_GROUP_DATABASE));
         this.context = context;
         jobManager = App.getInstance().getJobManager();
     }

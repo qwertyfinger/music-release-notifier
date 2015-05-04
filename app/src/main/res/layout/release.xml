@@ -15,22 +15,26 @@
         android:layout_toEndOf="@id/thumbnail"
         android:layout_toRightOf="@id/thumbnail"
         android:textColor="@android:color/white"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:paddingLeft="20dp"
+        android:paddingBottom="1dp"/>
     <TextView
         android:id="@+id/artist"
         android:layout_width="wrap_content"
-        android:layout_height="26dp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/title"
         android:layout_toEndOf="@id/thumbnail"
         android:layout_toRightOf="@id/thumbnail"
-        android:textSize="14sp"/>
+        android:textSize="14sp"
+        android:paddingLeft="20dp"/>
     <TextView
         android:id="@+id/date"
         android:layout_width="wrap_content"
-        android:layout_height="16dp"
-        android:layout_below="@id/artist"
+        android:layout_height="wrap_content"
         android:layout_toEndOf="@id/thumbnail"
         android:layout_toRightOf="@id/thumbnail"
         android:layout_alignParentBottom="true"
-        android:textSize="12sp"/>
+        android:textSize="14sp"
+        android:paddingLeft="20dp"
+        android:paddingBottom="5dp"/>
 </RelativeLayout>

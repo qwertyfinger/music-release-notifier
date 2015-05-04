@@ -20,7 +20,7 @@ public class SearchArtistJob extends Job {
     private final String query;
 
     public SearchArtistJob(String query) {
-        super(new Params(3).requireNetwork());
+        super(new Params(Constants.JOB_PRIORITY_CRITICAL).requireNetwork());
         this.query = query;
     }
 

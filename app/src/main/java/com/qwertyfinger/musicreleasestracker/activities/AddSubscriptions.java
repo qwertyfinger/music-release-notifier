@@ -30,18 +30,20 @@ import com.qwertyfinger.musicreleasestracker.events.ArtistAddedEvent;
 import com.qwertyfinger.musicreleasestracker.events.ArtistExistsEvent;
 import com.qwertyfinger.musicreleasestracker.events.SearchQueryEvent;
 import com.qwertyfinger.musicreleasestracker.events.SearchingEvent;
+import com.qwertyfinger.musicreleasestracker.jobs.FetchArtistsJob;
 import com.qwertyfinger.musicreleasestracker.jobs.RefreshReleasesJob;
 import com.qwertyfinger.musicreleasestracker.jobs.SearchArtistJob;
 import com.qwertyfinger.musicreleasestracker.misc.Artist;
 import com.qwertyfinger.musicreleasestracker.misc.ListScrollListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
 public class AddSubscriptions extends ActionBarActivity{
 
-    private boolean artistAdded = false;
+    private List<Artist> addedArtists = null;
     private JobManager jobManager;
     private ProgressBar spinner;
     private TextView noResult;
@@ -86,6 +88,54 @@ public class AddSubscriptions extends ActionBarActivity{
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_add_subscriptions, menu);
+        MenuItem search = menu.findItem(R.id.subscriptions_search);
+        // Get the SearchView and set the searchable configuration
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
+
+        // Assumes current activity is the searchable activity
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+        MenuItemCompat.expandActionView(search);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        if (addedArtists != null) {
+            jobManager.addJobInBackground(new RefreshReleasesJob(this, Constants.AFTER_ADDING_REFRESH, addedArtists));
+            jobManager.addJobInBackground(new FetchArtistsJob(this));
+        }
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
+    }
+
     public void onEventMainThread(SearchingEvent event){
         TextView empty = (TextView) findViewById(R.id.empty);
 
@@ -113,15 +163,18 @@ public class AddSubscriptions extends ActionBarActivity{
     }
 
     public void onEventMainThread(ArtistAddedEvent event) {
-        artistAdded = true;
+        if (addedArtists == null)
+            addedArtists = new ArrayList<>();
+        addedArtists.add(event.getArtist());
 
         DatabaseHandler db = DatabaseHandler.getInstance(this);
 
-        Log.d("Reading: ", "Reading all contacts..");
+        Log.d("Reading: ", "Reading all artists..");
+        Log.d("Count: ", db.getArtistsCount()+"");
         List<Artist> list = db.getAllArtists();
         for (Artist artist : list) {
-            String log = "Id: " + artist.getId() + " ,Name: " + artist.getTitle() + " ,ImageUrl: " + artist.getImageUri();
-            Log.d("Name: ", log);
+            String log = "Id: " + artist.getId() + " ,Name: " + artist.getTitle() + " ,ImageUrl: " + artist.getImage();
+            Log.d("Artist: ", log);
         }
     }
 
@@ -138,55 +191,5 @@ public class AddSubscriptions extends ActionBarActivity{
                 toast.cancel();
             }
         }, 1000);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_add_subscriptions, menu);
-        MenuItem search = menu.findItem(R.id.subscriptions_search);
-        // Get the SearchView and set the searchable configuration
-
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
-
-        // Assumes current activity is the searchable activity
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-//        MenuItemCompat.expandActionView(search);
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onStop(){
-        super.onStop();
-        if (artistAdded)
-            jobManager.addJobInBackground(new RefreshReleasesJob(this, Constants.AFTER_ADDING_REFRESH));
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-    }
-
-    @Override
-    protected void onDestroy(){
-        super.onDestroy();
-        try {
-            EventBus.getDefault().unregister(this);
-        }
-        catch (Throwable t){
-            //in case registration didn't go through
-        }
     }
 }

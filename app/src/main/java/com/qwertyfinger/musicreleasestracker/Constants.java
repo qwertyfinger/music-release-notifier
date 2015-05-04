@@ -8,6 +8,13 @@ public class Constants {
     public static final int AFTER_ADDING_REFRESH = 1;
     public static final int SCHEDULED_REFRESH = 2;
 
+    public static final int JOB_PRIORITY_LOW = 1;
+    public static final int JOB_PRIORITY_MEDIUM = 2;
+    public static final int JOB_PRIORITY_HIGH = 3;
+    public static final int JOB_PRIORITY_CRITICAL = 4;
+
+    public static final String JOB_GROUP_DATABASE = "database";
+
     public static final String TYPE_ALBUM = "album";
     public static final String TYPE_EP = "ep";
     public static final String TYPE_SINGLE = "single";

@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 
-import com.qwertyfinger.musicreleasestracker.events.ArtistAddedEvent;
 import com.qwertyfinger.musicreleasestracker.events.ArtistExistsEvent;
 import com.qwertyfinger.musicreleasestracker.misc.Artist;
 import com.qwertyfinger.musicreleasestracker.misc.Release;
@@ -87,7 +86,7 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
                     statement.bindString(4, release.getId());
                     statement.bindString(5, release.getArtist());
                     statement.bindString(6, release.getDate());
-                    statement.bindString(7, release.getImageUri());
+                    statement.bindString(7, release.getImage());
                     statement.execute();
                     statement.clearBindings();
                 }
@@ -154,7 +153,7 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
         values.put(ReleasesContract.ReleasesTable.COLUMN_NAME_TITLE, release.getTitle());
         values.put(ReleasesContract.ReleasesTable.COLUMN_NAME_ARTIST, release.getArtist());
         values.put(ReleasesContract.ReleasesTable.COLUMN_NAME_DATE, release.getDate());
-        values.put(ReleasesContract.ReleasesTable.COLUMN_NAME_IMAGE, release.getImageUri());
+        values.put(ReleasesContract.ReleasesTable.COLUMN_NAME_IMAGE, release.getImage());
 
         return db.update(ReleasesContract.ReleasesTable.TABLE_NAME, values, ReleasesContract.ReleasesTable.COLUMN_NAME_ID + " = ?", new String[] { release.getId() });
     }*/
@@ -199,12 +198,11 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
         try {
             statement.bindString(1, artist.getId());
             statement.bindString(2, artist.getTitle());
-            statement.bindString(3, artist.getImageUri());
+            statement.bindString(3, artist.getImage());
             statement.execute();
             statement.clearBindings();
 
             db.setTransactionSuccessful();
-            EventBus.getDefault().post(new ArtistAddedEvent());
         } catch (SQLiteConstraintException e) {
             EventBus.getDefault().post(new ArtistExistsEvent());
         } finally {

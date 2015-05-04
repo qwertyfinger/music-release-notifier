@@ -1,8 +1,8 @@
 package com.qwertyfinger.musicreleasestracker.fragments;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +22,7 @@ import com.qwertyfinger.musicreleasestracker.misc.ListScrollListener;
 import com.qwertyfinger.musicreleasestracker.misc.Release;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
@@ -35,22 +36,14 @@ public class ReleasesFragment extends Fragment {
     private TextView mNoArtists;
 
     @Override
-    public void onAttach(Activity activity){
-        super.onAttach(activity);
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
         jobManager = App.getInstance().getJobManager();
     }
 
-    // Inflate the fragment layout we defined above for this fragment
-    // Set the associated text for the title
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_releases, container, false);
 
         mNoArtists = (TextView) view.findViewById(R.id.noArtists);
@@ -69,12 +62,8 @@ public class ReleasesFragment extends Fragment {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        try {
+        if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this);
-        }
-        catch (Throwable t){
-            //in case registration didn't go through
-        }
     }
 
     public void onEventMainThread(ReleasesFetchedEvent event) {
@@ -87,7 +76,17 @@ public class ReleasesFragment extends Fragment {
 
     public void onEventMainThread(ReleasesChangedEvent event) {
         jobManager.addJobInBackground(new FetchReleasesJob(getActivity()));
+
         DatabaseHandler db = DatabaseHandler.getInstance(getActivity());
+
+        Log.d("Reading: ", "Reading all releases..");
+        Log.d("Count: ", db.getReleasesCount()+"");
+        List<Release> list = db.getAllReleases();
+        for (Release release : list) {
+            String log = "Id: " + release.getId() + " ,Name: " + release.getTitle() + " ,ImageUrl: " + release.getImage() + " ,Artist: "
+                    + release.getArtist() + " ,Date: " + release.getDate();
+            Log.d("Release: ", log);
+        }
     }
 
     public void onEventMainThread(NoArtistsEvent event){

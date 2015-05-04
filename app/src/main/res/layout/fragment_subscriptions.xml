@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- This is the fragment  to be displayed for a section associated with a tab -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView android:id="@+id/empty"
+
+    <se.emilsjolander.stickylistheaders.StickyListHeadersListView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/list"/>
+
+    <TextView android:id="@+id/noArtists"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="You have no subscriptions"
         android:gravity="center"
         android:textSize="20sp" />
 
-    <!--<se.emilsjolander.stickylistheaders.StickyListHeadersListView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/list"/>-->
-</LinearLayout>
+</RelativeLayout>

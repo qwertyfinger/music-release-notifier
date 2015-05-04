@@ -10,14 +10,11 @@ import com.qwertyfinger.musicreleasestracker.events.ReleasesChangedEvent;
 
 import de.greenrobot.event.EventBus;
 
-/**
- * called only when artists were emptied
- */
 public class EmptyReleasesJob extends Job{
     private final Context context;
 
     public EmptyReleasesJob(Context context) {
-        super(new Params(1).groupBy("database"));
+        super(new Params(Constants.JOB_PRIORITY_HIGH).groupBy(Constants.JOB_GROUP_DATABASE));
         this.context = context;
     }
 

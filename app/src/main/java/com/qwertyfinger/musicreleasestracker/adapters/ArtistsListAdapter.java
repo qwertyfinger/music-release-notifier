@@ -1,6 +1,7 @@
 package com.qwertyfinger.musicreleasestracker.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,34 +10,30 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.qwertyfinger.musicreleasestracker.R;
-import com.qwertyfinger.musicreleasestracker.misc.Release;
+import com.qwertyfinger.musicreleasestracker.misc.Artist;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.util.List;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
-public class ReleasesListAdapter extends ArrayAdapter<Release> implements StickyListHeadersAdapter {
+public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyListHeadersAdapter {
 
-    private String[] dates;
+    private String[] artists;
     private final Context context;
-    private long headerId = 0;
 
-    public ReleasesListAdapter(Context context, List<Release> releases) {
-        super(context, 0, releases);
+    public ArtistsListAdapter(Context context, List<Artist> artists) {
+        super(context, 0, artists);
         this.context = context;
-        dates = new String[releases.size()];
-        for (int i = 0; i < releases.size(); i++){
-            dates[i] = releases.get(i).getDate();
+        this.artists = new String[artists.size()];
+        for (int i = 0; i < artists.size(); i++){
+            this.artists[i] = artists.get(i).getTitle();
         }
     }
 
     class ViewHolder {
         public ImageView thumbnail;
         public TextView title;
-        public TextView artist;
-        public TextView date;
     }
 
     class HeaderViewHolder {
@@ -47,7 +44,7 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
     public View getView(int position, View convertView, ViewGroup parent){
 
         ViewHolder holder = null;
-        final Release release = getItem(position);
+        final Artist artist = getItem(position);
 
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.release, parent, false);
@@ -55,24 +52,32 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
             holder = new ViewHolder();
             holder.thumbnail = (ImageView) convertView.findViewById(R.id.thumbnail);
             holder.title = (TextView) convertView.findViewById(R.id.title);
-            holder.artist = (TextView) convertView.findViewById(R.id.artist);
-            holder.date = (TextView) convertView.findViewById(R.id.date);
 
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.title.setText(release.getTitle());
-        holder.artist.setText(release.getArtist());
-        holder.date.setText(dates[position]);
+        holder.title.setText(artist.getTitle());
 
-        File thumbnail = context.getFileStreamPath(release.getImage());
-
-        Picasso.with(context)
-                .load(thumbnail)
-                .tag(context)
-                .into(holder.thumbnail);
+        try {
+            Picasso.with(context)
+                    .load(artist.getImage())
+                    .config(Bitmap.Config.RGB_565)
+                    .error(R.drawable.no_image)
+                    .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
+                    .centerCrop()
+                    .tag(context)
+                    .into(holder.thumbnail);
+        } catch (Exception e) {
+            Picasso.with(context)
+                    .load(R.drawable.no_image)
+                    .config(Bitmap.Config.RGB_565)
+                    .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
+                    .centerCrop()
+                    .tag(context)
+                    .into(holder.thumbnail);
+        }
 
         return convertView;
     }
@@ -89,7 +94,7 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
             holder = (HeaderViewHolder) convertView.getTag();
         }
 
-        String headerText = "" + dates[position];
+        String headerText = "" + artists[position].subSequence(0, 1).charAt(0);
         holder.header.setText(headerText);
 
         return convertView;
@@ -97,6 +102,6 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
 
     @Override
     public long getHeaderId(int position) {
-        return headerId++;
+        return artists[position].subSequence(0, 1).charAt(0);
     }
 }

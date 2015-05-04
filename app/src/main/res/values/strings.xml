@@ -6,7 +6,7 @@
     <string name="action_add_subscription">Add Subscription</string>
     <string name="title_activity_add_subscriptions">AddSubscriptions</string>
     <string name="search_hint">Search artists</string>
-    <string name="action_refresh">Refresh releases</string>
-    <string name="action_empty_releases">Empty releases</string>
+    <string name="action_refresh">Refresh artists</string>
+    <string name="action_empty_releases">Empty artists</string>
     <string name="action_empty_artists">Empty Artists</string>
 </resources>

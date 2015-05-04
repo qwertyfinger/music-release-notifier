@@ -5,15 +5,15 @@ public class Release {
     private String title;
     private String artist;
     private String releaseDate;
-    private String imageUri;
+    private String image;
 
 
-    public Release(String id, String title, String artist, String releaseDate, String imageUri){
+    public Release(String id, String title, String artist, String releaseDate, String image){
         this.id = id;
         this.title = title;
         this.artist = artist;
         this.releaseDate = releaseDate;
-        this.imageUri = imageUri;
+        this.image = image;
     }
 
 
@@ -33,7 +33,7 @@ public class Release {
         return releaseDate;
     }
 
-    public String getImageUri() {
-        return imageUri;
+    public String getImage() {
+        return image;
     }
 }
