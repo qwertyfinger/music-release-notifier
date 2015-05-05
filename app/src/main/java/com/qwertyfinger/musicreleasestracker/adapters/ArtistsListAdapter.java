@@ -1,7 +1,6 @@
 package com.qwertyfinger.musicreleasestracker.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,7 @@ import com.qwertyfinger.musicreleasestracker.R;
 import com.qwertyfinger.musicreleasestracker.misc.Artist;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.List;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
@@ -60,24 +60,13 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
 
         holder.title.setText(artist.getTitle());
 
-        try {
-            Picasso.with(context)
-                    .load(artist.getImage())
-                    .config(Bitmap.Config.RGB_565)
-                    .error(R.drawable.no_image)
-                    .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
-                    .centerCrop()
-                    .tag(context)
-                    .into(holder.thumbnail);
-        } catch (Exception e) {
-            Picasso.with(context)
-                    .load(R.drawable.no_image)
-                    .config(Bitmap.Config.RGB_565)
-                    .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
-                    .centerCrop()
-                    .tag(context)
-                    .into(holder.thumbnail);
-        }
+        File thumbnail = context.getFileStreamPath(artist.getImage());
+
+        Picasso.with(context)
+                .load(thumbnail)
+                .error(R.drawable.no_image)
+                .tag(context)
+                .into(holder.thumbnail);
 
         return convertView;
     }

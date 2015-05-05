@@ -70,9 +70,10 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
         File thumbnail = context.getFileStreamPath(release.getImage());
 
         Picasso.with(context)
-                .load(thumbnail)
-                .tag(context)
-                .into(holder.thumbnail);
+            .load(thumbnail)
+            .error(R.drawable.no_image)
+            .tag(context)
+            .into(holder.thumbnail);
 
         return convertView;
     }

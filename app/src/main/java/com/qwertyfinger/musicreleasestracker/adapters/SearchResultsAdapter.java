@@ -56,7 +56,7 @@ public class SearchResultsAdapter extends ArrayAdapter<SearchResult> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.title.setText(searchResult.getName());
+        holder.title.setText(searchResult.getTitle());
 //        holder.control.setImageDrawable(null);
         holder.control.setOnClickListener(new View.OnClickListener() {
             @Override

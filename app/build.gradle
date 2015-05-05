@@ -1,9 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'MRTkey'
+            keyPassword '***REMOVED*** '
+            storeFile file('C:/Users/qwertyfinger/Google Drive/develop/android studio/keystore/keystore.jks')
+            storePassword '***REMOVED*** '
+        }
+    }
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
-
     defaultConfig {
         applicationId "com.qwertyfinger.musicreleasestracker"
         minSdkVersion 14
@@ -62,7 +69,7 @@ repositories {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'se.emilsjolander:stickylistheaders:2.6.0'
     compile 'com.birbit:android-priority-jobqueue:1.3'

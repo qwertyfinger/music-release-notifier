@@ -203,10 +203,6 @@ public class RefreshReleasesJob extends Job{
                         resultForDatabase.add(new Release(entry.getReleaseGroup().getId(), entry.getTitle(), entry.getArtistCreditString(), defaultFormatter.format(map.get(key).getDate()), filename));
                     }
                 }
-
-                //            db.addReleases(resultForDatabase);
-                //            if (actionId == Constants.EXPLICIT_REFRESH) EventBus.getDefault().post(new ReleasesChangedEvent(Constants.EXPLICIT_REFRESH));
-                //            if (actionId == Constants.AFTER_ADDING_REFRESH) EventBus.getDefault().post(new ReleasesChangedEvent(Constants.AFTER_ADDING_REFRESH));
             }
         } catch (Exception e){
             if (EventBus.getDefault().isRegistered(this))

@@ -1,38 +1,26 @@
 package com.qwertyfinger.musicreleasestracker.misc;
 
 public class SearchResult {
-    private String mName;
-    private String mImageUrl;
-    private String mbid;
+    private String title;
+    private String imageUrl;
+    private String id;
 
-    public SearchResult(String name, String imageUrl, String mbid){
-        this.mName = name;
-        this.mImageUrl = imageUrl;
-        this.mbid = mbid;
+    public SearchResult(String title, String imageUrl, String id){
+        this.title = title;
+        this.imageUrl = imageUrl;
+        this.id = id;
     }
 
 
     public String getImageUrl() {
-        return mImageUrl;
+        return imageUrl;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.mImageUrl = imageUrl;
+    public String getTitle() {
+        return title;
     }
 
-    public String getName() {
-        return mName;
-    }
-
-    public void setName(String name) {
-        this.mName = name;
-    }
-
-    public String getMbid() {
-        return mbid;
-    }
-
-    public void setMbid(String mbid) {
-        this.mbid = mbid;
+    public String getId() {
+        return id;
     }
 }
