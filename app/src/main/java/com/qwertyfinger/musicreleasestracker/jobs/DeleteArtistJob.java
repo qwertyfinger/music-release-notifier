@@ -27,6 +27,7 @@ public class DeleteArtistJob extends Job {
     public void onRun() throws Throwable {
         DatabaseHandler db = DatabaseHandler.getInstance(context);
         db.deleteArtist(artistId);
+        context.deleteFile(artistId+".jpg");
 //        EventBus.getDefault().post(new ArtistAddedEvent(artist));
     }
 

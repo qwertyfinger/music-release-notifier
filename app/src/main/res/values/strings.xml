@@ -1,12 +1,14 @@
 <resources>
     <string name="app_name">MRT</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
-    <string name="action_add_subscription">Add Subscription</string>
-    <string name="title_activity_add_subscriptions">AddSubscriptions</string>
+    <string name="action_add_subscription">Add subscription</string>
+    <string name="title_activity_add_subscriptions">Add subscriptions</string>
     <string name="search_hint">Search artists</string>
-    <string name="action_refresh">Refresh artists</string>
-    <string name="action_empty_releases">Empty artists</string>
-    <string name="action_empty_artists">Empty Artists</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_empty_releases">Empty releases</string>
+    <string name="action_empty_artists">Empty artists</string>
+    <string name="noSearchResults">Sorry, couldn\'t find anything</string>
+    <string name="noReleases">No upcoming releases</string>
+    <string name="noSubscriptions">You have no subscriptions</string>
 </resources>

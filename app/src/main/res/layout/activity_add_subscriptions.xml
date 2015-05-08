@@ -13,14 +13,14 @@
     <TextView android:id="@+id/noResult"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Sorry, couldn't find anything"
+        android:text="@string/noSearchResults"
         android:gravity="center"
         android:textSize="20sp"/>
 
     <TextView android:id="@+id/empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Search artist"
+        android:text="@string/search_hint"
         android:gravity="center"
         android:textSize="20sp"/>
 

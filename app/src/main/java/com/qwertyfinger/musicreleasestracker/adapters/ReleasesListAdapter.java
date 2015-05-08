@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.qwertyfinger.musicreleasestracker.R;
 import com.qwertyfinger.musicreleasestracker.misc.Release;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -71,6 +72,7 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
 
         Picasso.with(context)
             .load(thumbnail)
+            .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
             .error(R.drawable.no_image)
             .tag(context)
             .into(holder.thumbnail);

@@ -12,6 +12,7 @@ import com.qwertyfinger.musicreleasestracker.misc.Artist;
 import com.qwertyfinger.musicreleasestracker.misc.Release;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -73,7 +74,8 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
                     + "COALESCE(?, 'TBA'), " +
                     "COALESCE((SELECT " + ReleasesContract.ReleasesTable.COLUMN_NAME_ARTIST + " FROM " + ReleasesContract.ReleasesTable.TABLE_NAME
                     + " WHERE " + ReleasesContract.ReleasesTable.COLUMN_NAME_ID + " = ?), ?), "
-                    + "COALESCE(?, 'TBA'), ?);";
+                    + "COALESCE(?, 'TBA'), COALESCE((SELECT " + ReleasesContract.ReleasesTable.COLUMN_NAME_IMAGE + " FROM "
+                    + ReleasesContract.ReleasesTable.TABLE_NAME + " WHERE " + ReleasesContract.ReleasesTable.COLUMN_NAME_ID + " = ?), ?));";
             SQLiteStatement statement = db.compileStatement(sql);
 
             db.beginTransaction();
@@ -86,7 +88,8 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
                     statement.bindString(4, release.getId());
                     statement.bindString(5, release.getArtist());
                     statement.bindString(6, release.getDate());
-                    statement.bindString(7, release.getImage());
+                    statement.bindString(7, release.getId());
+                    statement.bindString(8, release.getImage());
                     statement.execute();
                     statement.clearBindings();
                 }
@@ -141,6 +144,8 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
         if(cursor != null && !cursor.isClosed()){
             cursor.close();
         }
+
+        Collections.sort(releaseList);
 
         return releaseList;
     }
@@ -233,7 +238,7 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
     public List<Artist> getAllArtists() {
         List<Artist> artistList = new ArrayList<>();
 
-        String selectQuery = "SELECT  * FROM " + ArtistsContract.ArtistsTable.TABLE_NAME;
+        String selectQuery = "SELECT  * FROM " + ArtistsContract.ArtistsTable.TABLE_NAME + " ORDER BY " + ArtistsContract.ArtistsTable.COLUMN_NAME_TITLE + " ASC";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);

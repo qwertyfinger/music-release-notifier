@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.qwertyfinger.musicreleasestracker.R;
 import com.qwertyfinger.musicreleasestracker.misc.Artist;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -63,10 +64,11 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
         File thumbnail = context.getFileStreamPath(artist.getImage());
 
         Picasso.with(context)
-                .load(thumbnail)
-                .error(R.drawable.no_image)
-                .tag(context)
-                .into(holder.thumbnail);
+            .load(thumbnail)
+            .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
+            .error(R.drawable.no_image)
+            .tag(context)
+            .into(holder.thumbnail);
 
         return convertView;
     }

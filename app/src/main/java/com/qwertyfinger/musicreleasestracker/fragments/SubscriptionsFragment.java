@@ -11,6 +11,7 @@ import com.path.android.jobqueue.JobManager;
 import com.qwertyfinger.musicreleasestracker.App;
 import com.qwertyfinger.musicreleasestracker.R;
 import com.qwertyfinger.musicreleasestracker.adapters.ArtistsListAdapter;
+import com.qwertyfinger.musicreleasestracker.events.ArtistDeletedEvent;
 import com.qwertyfinger.musicreleasestracker.events.ArtistsFetchedEvent;
 import com.qwertyfinger.musicreleasestracker.events.NoArtistsEvent;
 import com.qwertyfinger.musicreleasestracker.jobs.FetchArtistsJob;
@@ -70,5 +71,9 @@ public class SubscriptionsFragment extends Fragment{
 
         mAdapter = new ArtistsListAdapter(getActivity(), new ArrayList<Artist>());
         mStickyList.setAdapter(mAdapter);
+    }
+
+    public void onEventMainThread(ArtistDeletedEvent event){
+        jobManager.addJobInBackground(new FetchArtistsJob(getActivity()));
     }
 }

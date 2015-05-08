@@ -11,11 +11,13 @@ import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasestracker.Constants;
 import com.qwertyfinger.musicreleasestracker.R;
 import com.qwertyfinger.musicreleasestracker.database.DatabaseHandler;
-import com.qwertyfinger.musicreleasestracker.events.CoversLoadedEvent;
 import com.qwertyfinger.musicreleasestracker.events.NoArtistsEvent;
 import com.qwertyfinger.musicreleasestracker.events.ReleasesChangedEvent;
+import com.qwertyfinger.musicreleasestracker.events.ReleasesLoadedEvent;
 import com.qwertyfinger.musicreleasestracker.misc.Artist;
 import com.qwertyfinger.musicreleasestracker.misc.Release;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -116,6 +118,11 @@ public class RefreshReleasesJob extends Job{
                         }
                     }
 
+                    if (map.isEmpty() && i == artists.size()) {
+                        EventBus.getDefault().post(new ReleasesLoadedEvent());
+                        return;
+                    }
+
                     final Iterator<String> iterator = map.keySet().iterator();
 
                     while (iterator.hasNext()) {
@@ -157,9 +164,9 @@ public class RefreshReleasesJob extends Job{
                                 } catch (FileNotFoundException e) {
                                     e.printStackTrace();
                                 }
-                                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
                                 if (counter == artists.size())
-                                    EventBus.getDefault().post(new CoversLoadedEvent());
+                                    EventBus.getDefault().post(new ReleasesLoadedEvent());
                             }
 
                             @Override
@@ -180,6 +187,8 @@ public class RefreshReleasesJob extends Job{
                                 try {
                                     Picasso.with(context)
                                             .load(imageUrl)
+                                            .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                                            .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                                             .config(Bitmap.Config.RGB_565)
                                             .error(R.drawable.no_image)
                                             .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
@@ -189,6 +198,8 @@ public class RefreshReleasesJob extends Job{
                                 } catch (java.lang.IllegalArgumentException e) {
                                     Picasso.with(context)
                                             .load(R.drawable.no_image)
+                                            .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                                            .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                                             .config(Bitmap.Config.RGB_565)
                                             .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
                                             .centerCrop()
@@ -223,12 +234,14 @@ public class RefreshReleasesJob extends Job{
         return false;
     }
 
-    public void onEventMainThread(CoversLoadedEvent event){
-        db.addReleases(resultForDatabase);
-        if (actionId == Constants.EXPLICIT_REFRESH)
-            EventBus.getDefault().post(new ReleasesChangedEvent(Constants.EXPLICIT_REFRESH));
-        if (actionId == Constants.AFTER_ADDING_REFRESH)
-            EventBus.getDefault().post(new ReleasesChangedEvent(Constants.AFTER_ADDING_REFRESH));
+    public void onEventMainThread(ReleasesLoadedEvent event){
+        if (!resultForDatabase.isEmpty()) {
+            db.addReleases(resultForDatabase);
+            if (actionId == Constants.EXPLICIT_REFRESH)
+                EventBus.getDefault().post(new ReleasesChangedEvent(Constants.EXPLICIT_REFRESH));
+            if (actionId == Constants.AFTER_ADDING_REFRESH)
+                EventBus.getDefault().post(new ReleasesChangedEvent(Constants.AFTER_ADDING_REFRESH));
+        }
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this);
     }

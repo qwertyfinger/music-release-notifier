@@ -15,6 +15,7 @@ import com.qwertyfinger.musicreleasestracker.App;
 import com.qwertyfinger.musicreleasestracker.R;
 import com.qwertyfinger.musicreleasestracker.jobs.AddArtistJob;
 import com.qwertyfinger.musicreleasestracker.misc.SearchResult;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -67,6 +68,7 @@ public class SearchResultsAdapter extends ArrayAdapter<SearchResult> {
         try {
             Picasso.with(context)
                     .load(searchResult.getImageUrl())
+                    .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                     .config(Bitmap.Config.RGB_565)
                     .error(R.drawable.no_image)
                     .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
@@ -76,6 +78,7 @@ public class SearchResultsAdapter extends ArrayAdapter<SearchResult> {
         catch (java.lang.IllegalArgumentException e){
             Picasso.with(context)
                     .load(R.drawable.no_image)
+                    .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                     .config(Bitmap.Config.RGB_565)
                     .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
                     .centerCrop()

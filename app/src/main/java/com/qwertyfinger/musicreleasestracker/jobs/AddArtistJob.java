@@ -14,6 +14,8 @@ import com.qwertyfinger.musicreleasestracker.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasestracker.events.ArtistAddedEvent;
 import com.qwertyfinger.musicreleasestracker.misc.Artist;
 import com.qwertyfinger.musicreleasestracker.misc.SearchResult;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -55,10 +57,10 @@ public class AddArtistJob extends Job{
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
                 artist.setImage(filename);
-                EventBus.getDefault().post(new ArtistAddedEvent(artist));
                 db.addArtist(artist);
+                EventBus.getDefault().post(new ArtistAddedEvent(artist));
             }
 
             @Override
@@ -79,6 +81,8 @@ public class AddArtistJob extends Job{
                 try {
                     Picasso.with(context)
                             .load(imageUrl)
+                            .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                            .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                             .config(Bitmap.Config.RGB_565)
                             .error(R.drawable.no_image)
                             .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
@@ -88,6 +92,8 @@ public class AddArtistJob extends Job{
                 } catch (java.lang.IllegalArgumentException e) {
                     Picasso.with(context)
                             .load(R.drawable.no_image)
+                            .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                            .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                             .config(Bitmap.Config.RGB_565)
                             .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
                             .centerCrop()

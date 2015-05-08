@@ -1,19 +1,22 @@
 package com.qwertyfinger.musicreleasestracker.activities;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.SearchRecentSuggestions;
+import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -41,7 +44,7 @@ import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class AddSubscriptions extends ActionBarActivity{
+public class AddSubscriptions extends AppCompatActivity{
 
     private List<Artist> addedArtists = null;
     private JobManager jobManager;
@@ -79,10 +82,11 @@ public class AddSubscriptions extends ActionBarActivity{
 
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            // handles a search query
             String query = intent.getStringExtra(SearchManager.QUERY);
+
             SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this, MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
             suggestions.saveRecentQuery(query, null);
+
             if (query.trim().length() > 1)
                 jobManager.addJobInBackground(new SearchArtistJob(query));
         }
@@ -92,26 +96,44 @@ public class AddSubscriptions extends ActionBarActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_add_subscriptions, menu);
         MenuItem search = menu.findItem(R.id.subscriptions_search);
-        // Get the SearchView and set the searchable configuration
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
 
-        // Assumes current activity is the searchable activity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-        MenuItemCompat.expandActionView(search);
+        searchView.setSubmitButtonEnabled(true);
+        searchView.setQueryHint("Search artists...");
+        final Activity activity = this;
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            private boolean extended = false;
 
+            @Override
+            public void onClick(View v) {
+                if (!extended) {
+                    extended = true;
+                    ViewGroup.LayoutParams lp = v.getLayoutParams();
+                    lp.width = ActionBar.LayoutParams.MATCH_PARENT;
+                }
+            }
+        });
+        MenuItemCompat.setOnActionExpandListener(search, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                NavUtils.navigateUpFromSameTask(activity);
+                return false;
+            }
+        });
+        MenuItemCompat.expandActionView(search);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
         return super.onOptionsItemSelected(item);
     }
 

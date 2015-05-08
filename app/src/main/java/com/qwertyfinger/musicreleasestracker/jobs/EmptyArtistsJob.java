@@ -9,7 +9,9 @@ import com.qwertyfinger.musicreleasestracker.App;
 import com.qwertyfinger.musicreleasestracker.Constants;
 import com.qwertyfinger.musicreleasestracker.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasestracker.events.ArtistDeletedEvent;
-import com.qwertyfinger.musicreleasestracker.events.NoArtistsEvent;
+import com.qwertyfinger.musicreleasestracker.misc.Artist;
+
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
@@ -33,10 +35,12 @@ public class EmptyArtistsJob extends Job {
     public void onRun() throws Throwable {
         DatabaseHandler db = DatabaseHandler.getInstance(context);
 
-        if (db.getArtistsCount() == 0) {
-            EventBus.getDefault().post(new NoArtistsEvent());
-        }
-        else {
+        if (db.getArtistsCount() > 0) {
+            List<Artist> artists = db.getAllArtists();
+            for (Artist artist: artists){
+                context.deleteFile(artist.getImage());
+            }
+
             db.deleteAllArtists();
             EventBus.getDefault().post(new ArtistDeletedEvent());
             jobManager.addJobInBackground(new EmptyReleasesJob(context));

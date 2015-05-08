@@ -7,6 +7,9 @@ import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasestracker.Constants;
 import com.qwertyfinger.musicreleasestracker.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasestracker.events.ReleasesChangedEvent;
+import com.qwertyfinger.musicreleasestracker.misc.Release;
+
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
@@ -26,8 +29,16 @@ public class EmptyReleasesJob extends Job{
     @Override
     public void onRun() throws Throwable {
         DatabaseHandler db = DatabaseHandler.getInstance(context);
-        db.deleteAllReleases();
-        EventBus.getDefault().post(new ReleasesChangedEvent(Constants.AFTER_ADDING_REFRESH));
+
+        if (db.getReleasesCount() > 0) {
+            List<Release> releases = db.getAllReleases();
+            for (Release release: releases){
+                context.deleteFile(release.getImage());
+            }
+
+            db.deleteAllReleases();
+            EventBus.getDefault().post(new ReleasesChangedEvent(Constants.AFTER_ADDING_REFRESH));
+        }
     }
 
     @Override

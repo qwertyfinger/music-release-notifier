@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MRT</string>
+    <string name="action_add_subscription">Додати підписку</string>
+    <string name="action_empty_artists">Видалити усі підписки</string>
+    <string name="action_empty_releases">Видалити усі релізи</string>
+    <string name="action_refresh">Оновити</string>
+    <string name="action_search">Пошук</string>
+    <string name="action_settings">Налаштування</string>
+    <string name="noReleases">Немає майбутніх релізів</string>
+    <string name="noSearchResults">Пошук не дав результатів</string>
+    <string name="noSubscriptions">У вас немає підписок</string>
+    <string name="search_hint">Пошук виконавців</string>
+    <string name="title_activity_add_subscriptions">Додати підписки</string>
+    <string name="title_activity_settings">Налаштування</string>
+</resources>

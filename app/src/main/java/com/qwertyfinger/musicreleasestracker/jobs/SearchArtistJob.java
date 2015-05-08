@@ -40,6 +40,10 @@ public class SearchArtistJob extends Job {
         for (Artist artist: artists){
             String mbid = artist.getMbid();
             if (!mbid.equals("")) {
+                if (artist.getName().equalsIgnoreCase("muse"))
+                    mbid = "9c9f1380-2516-4fc9-a3e6-f9f61941d090";
+                if (artist.getName().equalsIgnoreCase("placebo"))
+                    mbid = "847e8284-8582-4b0e-9c26-b042a4f49e57";
                 String imageUrl = artist.getImageURL(ImageSize.EXTRALARGE);
                 searchResults.add(new SearchResult(artist.getName(), imageUrl, mbid));
             }
