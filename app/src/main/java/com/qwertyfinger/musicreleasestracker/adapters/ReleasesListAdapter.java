@@ -14,6 +14,10 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
@@ -22,7 +26,6 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
 
     private String[] dates;
     private final Context context;
-    private long headerId = 0;
 
     public ReleasesListAdapter(Context context, List<Release> releases) {
         super(context, 0, releases);
@@ -100,6 +103,16 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
 
     @Override
     public long getHeaderId(int position) {
-        return headerId++;
+        DateFormat formatter = DateFormat.getDateInstance(DateFormat.LONG);
+        Date date = null;
+
+        try {
+            date = formatter.parse(dates[position]);
+        } catch (ParseException e) {}
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        return Long.parseLong(calendar.get(Calendar.YEAR) + "" + calendar.get(Calendar.MONTH) + "" + calendar.get(Calendar.DAY_OF_MONTH));
     }
 }
