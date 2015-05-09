@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
@@ -13,8 +14,6 @@ import com.qwertyfinger.musicreleasestracker.R;
 import com.qwertyfinger.musicreleasestracker.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasestracker.events.ArtistAddedEvent;
 import com.qwertyfinger.musicreleasestracker.misc.Artist;
-import com.qwertyfinger.musicreleasestracker.misc.SearchResult;
-import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -27,13 +26,15 @@ import de.greenrobot.event.EventBus;
 public class AddArtistJob extends Job{
 
     private final Context context;
-    private final SearchResult searchResult;
+    private final Artist artist;
     private Target target;
+    private View view;
 
-    public AddArtistJob(Context c, SearchResult searchResult) {
+    public AddArtistJob(Context c, Artist artist, View view) {
         super(new Params(Constants.JOB_PRIORITY_LOW).groupBy(Constants.JOB_GROUP_DATABASE));
         this.context = c;
-        this.searchResult = searchResult;
+        this.artist = artist;
+        this.view = view;
     }
 
     @Override
@@ -44,7 +45,6 @@ public class AddArtistJob extends Job{
     @Override
     public void onRun() throws Throwable {
         final DatabaseHandler db = DatabaseHandler.getInstance(context);
-        final Artist artist = new Artist(searchResult.getId(), searchResult.getTitle(), searchResult.getImageUrl());
         final String imageUrl = artist.getImage();
         final String filename = artist.getId() + ".jpg";
 
@@ -60,7 +60,7 @@ public class AddArtistJob extends Job{
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
                 artist.setImage(filename);
                 db.addArtist(artist);
-                EventBus.getDefault().post(new ArtistAddedEvent(artist));
+                EventBus.getDefault().post(new ArtistAddedEvent(artist, view));
             }
 
             @Override
@@ -81,7 +81,6 @@ public class AddArtistJob extends Job{
                 try {
                     Picasso.with(context)
                             .load(imageUrl)
-                            .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
                             .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                             .config(Bitmap.Config.RGB_565)
                             .error(R.drawable.no_image)
@@ -92,7 +91,6 @@ public class AddArtistJob extends Job{
                 } catch (java.lang.IllegalArgumentException e) {
                     Picasso.with(context)
                             .load(R.drawable.no_image)
-                            .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
                             .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                             .config(Bitmap.Config.RGB_565)
                             .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)

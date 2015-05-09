@@ -89,6 +89,7 @@ public class RefreshReleasesJob extends Job{
                 for (Artist artist : artists) {
                     i++;
                     Map<String, ReleaseWs2> map = new HashMap<>();
+                    Map<String, String> idMap = new HashMap<>();
                     int year = Calendar.getInstance().get(Calendar.YEAR);
                     org.musicbrainz.controller.Release release = new org.musicbrainz.controller.Release();
 
@@ -109,11 +110,15 @@ public class RefreshReleasesJob extends Job{
                         String releaseType = entry.getRelease().getReleaseGroup().getTypeString();
 
                         if ((releaseMonth > month || (releaseMonth == month && releaseDay >= day)) && releaseType.equalsIgnoreCase(Constants.TYPE_ALBUM)) {
-                            if (!map.containsKey(entry.getRelease().getTitle()))
+                            if (!map.containsKey(entry.getRelease().getTitle())) {
                                 map.put(entry.getRelease().getTitle(), entry.getRelease());
+                                idMap.put(entry.getRelease().getTitle(), artist.getId());
+                            }
                             else {
-                                if (map.get(entry.getRelease().getTitle()).getDate().after(entry.getRelease().getDate()))
+                                if (map.get(entry.getRelease().getTitle()).getDate().after(entry.getRelease().getDate())) {
                                     map.put(entry.getRelease().getTitle(), entry.getRelease());
+                                    idMap.put(entry.getRelease().getTitle(), artist.getId());
+                                }
                             }
                         }
                     }
@@ -129,26 +134,7 @@ public class RefreshReleasesJob extends Job{
                         String key = iterator.next();
                         ReleaseWs2 entry = map.get(key);
 
-                        //coverArtArchive implementation
-                        /*CoverArtArchiveClient client = new DefaultCoverArtArchiveClient();
-                        UUID mbid = UUID.fromString(id);
-
-                        CoverArt coverArt = client.getReleaseGroupByMbid(mbid);
-
-                        String filename = "";
-                        if (coverArt != null) {
-                            *//*File ext = Environment.getRootDirectory();
-                            File dir = new File (ext.getAbsolutePath() + "/mrtData/images/covers");
-                            dir.mkdirs();*//*
-                            filename = mbid.toString() + "_" + coverArt.getFrontImage().getId() + ".jpg";
-    //                        File file = new File(dir, filename);
-
-                            Bitmap cover = BitmapFactory.decodeStream(coverArt.getFrontImage().getSmallThumbnail());
-                            FileOutputStream out = context.openFileOutput(filename, Context.MODE_PRIVATE);
-                            cover.compress(Bitmap.CompressFormat.JPEG, 75, out);
-                        }*/
-
-                        Caller.getInstance().setUserAgent("tst");
+                        Caller.getInstance().setUserAgent(Constants.LASTFM_USER_AGENT);
                         Caller.getInstance().setCache(null);
                         Album album = Album.getInfo(entry.getArtistCreditString(), entry.getTitle(), Constants.LASTFM_API_KEY);
                         final String imageUrl = album.getImageURL(ImageSize.EXTRALARGE);
@@ -187,7 +173,7 @@ public class RefreshReleasesJob extends Job{
                                 try {
                                     Picasso.with(context)
                                             .load(imageUrl)
-                                            .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                                            .memoryPolicy(MemoryPolicy.NO_CACHE)
                                             .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                                             .config(Bitmap.Config.RGB_565)
                                             .error(R.drawable.no_image)
@@ -198,7 +184,7 @@ public class RefreshReleasesJob extends Job{
                                 } catch (java.lang.IllegalArgumentException e) {
                                     Picasso.with(context)
                                             .load(R.drawable.no_image)
-                                            .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                                            .memoryPolicy(MemoryPolicy.NO_CACHE)
                                             .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                                             .config(Bitmap.Config.RGB_565)
                                             .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
@@ -211,7 +197,8 @@ public class RefreshReleasesJob extends Job{
 
                         DateFormat defaultFormatter = DateFormat.getDateInstance(DateFormat.LONG);
 
-                        resultForDatabase.add(new Release(entry.getReleaseGroup().getId(), entry.getTitle(), entry.getArtistCreditString(), defaultFormatter.format(map.get(key).getDate()), filename));
+                        resultForDatabase.add(new Release(entry.getReleaseGroup().getId(), entry.getTitle(), entry.getArtistCreditString(),
+                                defaultFormatter.format(map.get(key).getDate()), filename, idMap.get(key)));
                     }
                 }
             }

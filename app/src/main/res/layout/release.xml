@@ -6,7 +6,8 @@
     <ImageView
         android:id="@+id/thumbnail"
         android:layout_width="130dp"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:contentDescription="@string/thumbnailDescription" />
 
     <TextView
         android:id="@+id/title"

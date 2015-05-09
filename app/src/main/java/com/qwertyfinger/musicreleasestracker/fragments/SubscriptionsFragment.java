@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import de.greenrobot.event.EventBus;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public class SubscriptionsFragment extends Fragment{
+public class SubscriptionsFragment extends Fragment {
 
     private JobManager jobManager;
     private ArtistsListAdapter mAdapter;

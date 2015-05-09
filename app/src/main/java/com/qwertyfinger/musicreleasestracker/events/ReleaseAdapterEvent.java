@@ -1,4 +1,4 @@
 package com.qwertyfinger.musicreleasestracker.events;
 
-public class ArtistsImageLoadedEvent {
+public class ReleaseAdapterEvent {
 }

@@ -30,7 +30,9 @@ import com.qwertyfinger.musicreleasestracker.adapters.SearchResultsAdapter;
 import com.qwertyfinger.musicreleasestracker.contentProviders.MySuggestionProvider;
 import com.qwertyfinger.musicreleasestracker.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasestracker.events.ArtistAddedEvent;
+import com.qwertyfinger.musicreleasestracker.events.ArtistDeletedEvent;
 import com.qwertyfinger.musicreleasestracker.events.ArtistExistsEvent;
+import com.qwertyfinger.musicreleasestracker.events.ReleaseAdapterEvent;
 import com.qwertyfinger.musicreleasestracker.events.SearchQueryEvent;
 import com.qwertyfinger.musicreleasestracker.events.SearchingEvent;
 import com.qwertyfinger.musicreleasestracker.jobs.FetchArtistsJob;
@@ -103,6 +105,7 @@ public class AddSubscriptions extends AppCompatActivity{
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setSubmitButtonEnabled(true);
         searchView.setQueryHint("Search artists...");
+
         final Activity activity = this;
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             private boolean extended = false;
@@ -154,6 +157,7 @@ public class AddSubscriptions extends AppCompatActivity{
     @Override
     protected void onDestroy(){
         super.onDestroy();
+        EventBus.getDefault().post(new ReleaseAdapterEvent());
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this);
     }
@@ -161,22 +165,17 @@ public class AddSubscriptions extends AppCompatActivity{
     public void onEventMainThread(SearchingEvent event){
         TextView empty = (TextView) findViewById(R.id.empty);
 
-        if (empty.getVisibility() != View.GONE)
-            empty.setVisibility(View.GONE);
+        empty.setVisibility(View.GONE);
 
-        if (noResult.getVisibility() != View.GONE)
-            noResult.setVisibility(View.GONE);
+        noResult.setVisibility(View.GONE);
 
-        if (spinner.getVisibility() == View.GONE)
-            spinner.setVisibility(View.VISIBLE);
+        spinner.setVisibility(View.VISIBLE);
     }
 
     public void onEventMainThread(SearchQueryEvent event){
-        if (spinner.getVisibility() != View.GONE)
-            spinner.setVisibility(View.GONE);
+        spinner.setVisibility(View.GONE);
 
-        if (noResult.getVisibility() == View.GONE)
-            noResult.setVisibility(View.VISIBLE);
+        noResult.setVisibility(View.VISIBLE);
 
         ListView listView = (ListView) findViewById(R.id.list);
         listView.setOnScrollListener(new ListScrollListener(this));
@@ -189,15 +188,46 @@ public class AddSubscriptions extends AppCompatActivity{
             addedArtists = new ArrayList<>();
         addedArtists.add(event.getArtist());
 
+        CharSequence text = "Added " + event.getArtist().getTitle();
+        final Toast toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+//                    toast.setGravity(Gravity.CENTER_VERTICAL, 0, context.getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material));
+        toast.show();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                toast.cancel();
+            }
+        }, 1000);
+
         DatabaseHandler db = DatabaseHandler.getInstance(this);
 
         Log.d("Reading: ", "Reading all artists..");
-        Log.d("Count: ", db.getArtistsCount()+"");
+        Log.d("Count: ", db.getArtistsCount() + "");
         List<Artist> list = db.getAllArtists();
         for (Artist artist : list) {
             String log = "Id: " + artist.getId() + " ,Name: " + artist.getTitle() + " ,ImageUrl: " + artist.getImage();
             Log.d("Artist: ", log);
         }
+    }
+
+    public void onEventMainThread(ArtistDeletedEvent event) {
+        if (addedArtists != null)
+            addedArtists.remove(event.getArtist());
+
+        CharSequence text = "Removed " + event.getArtist().getTitle();
+        final Toast toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+//                    toast.setGravity(Gravity.CENTER_VERTICAL, 0, context.getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material));
+        toast.show();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                toast.cancel();
+            }
+        }, 1000);
     }
 
     public void onEventMainThread(ArtistExistsEvent event){

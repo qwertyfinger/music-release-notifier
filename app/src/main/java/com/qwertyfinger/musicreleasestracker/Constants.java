@@ -15,6 +15,8 @@ public class Constants {
 
     public static final String JOB_GROUP_DATABASE = "database";
 
+    public static final String LASTFM_USER_AGENT = "Music Release Tracker / Andriy Chubko (donandrino@gmail.com)";
+
     public static final String TYPE_ALBUM = "album";
     public static final String TYPE_EP = "ep";
     public static final String TYPE_SINGLE = "single";

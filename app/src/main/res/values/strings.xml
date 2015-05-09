@@ -11,4 +11,8 @@
     <string name="noSearchResults">Sorry, couldn\'t find anything</string>
     <string name="noReleases">No upcoming releases</string>
     <string name="noSubscriptions">You have no subscriptions</string>
+    <string name="thumbnailDescription">thumbnail</string>
+    <string name="controlButtonDescription">controlButton</string>
+    <string name="controlRemoveDescription">Remove artist from subscriptions</string>
+    <string name="controlAddDescription">Subscribe to this artist</string>
 </resources>

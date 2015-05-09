@@ -3,9 +3,9 @@ package com.qwertyfinger.musicreleasestracker.jobs;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasestracker.Constants;
+import com.qwertyfinger.musicreleasestracker.events.ReleaseAdapterEvent;
 import com.qwertyfinger.musicreleasestracker.events.SearchQueryEvent;
 import com.qwertyfinger.musicreleasestracker.events.SearchingEvent;
-import com.qwertyfinger.musicreleasestracker.misc.SearchResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,28 +27,29 @@ public class SearchArtistJob extends Job {
     @Override
     public void onAdded() {
         EventBus.getDefault().post(new SearchingEvent());
+        EventBus.getDefault().post(new ReleaseAdapterEvent());
     }
 
     @Override
     public void onRun() throws Throwable {
-        Caller.getInstance().setUserAgent("tst");
+        Caller.getInstance().setUserAgent(Constants.LASTFM_USER_AGENT);
         Caller.getInstance().setCache(null);
 
-        List<SearchResult> searchResults = new ArrayList<>();
+        List<com.qwertyfinger.musicreleasestracker.misc.Artist> finalArtists = new ArrayList<>();
         List<Artist> artists = (ArrayList<Artist>) Artist.search(query, Constants.LASTFM_API_KEY);
 
         for (Artist artist: artists){
-            String mbid = artist.getMbid();
-            if (!mbid.equals("")) {
+            String id = artist.getMbid();
+            if (!id.equals("")) {
                 if (artist.getName().equalsIgnoreCase("muse"))
-                    mbid = "9c9f1380-2516-4fc9-a3e6-f9f61941d090";
+                    id = "9c9f1380-2516-4fc9-a3e6-f9f61941d090";
                 if (artist.getName().equalsIgnoreCase("placebo"))
-                    mbid = "847e8284-8582-4b0e-9c26-b042a4f49e57";
+                    id = "847e8284-8582-4b0e-9c26-b042a4f49e57";
                 String imageUrl = artist.getImageURL(ImageSize.EXTRALARGE);
-                searchResults.add(new SearchResult(artist.getName(), imageUrl, mbid));
+                finalArtists.add(new com.qwertyfinger.musicreleasestracker.misc.Artist(id, artist.getName(), imageUrl));
             }
         }
-        EventBus.getDefault().post(new SearchQueryEvent(searchResults));
+        EventBus.getDefault().post(new SearchQueryEvent(finalArtists));
     }
 
     @Override

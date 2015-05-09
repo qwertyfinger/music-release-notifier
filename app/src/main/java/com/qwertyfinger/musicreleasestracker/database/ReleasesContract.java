@@ -12,5 +12,6 @@ public class ReleasesContract {
         public static final String COLUMN_NAME_ARTIST = "artist";
         public static final String COLUMN_NAME_DATE = "date";
         public static final String COLUMN_NAME_IMAGE = "image";
+        public static final String COLUMN_NAME_ARTISTID = "artistId";
     }
 }

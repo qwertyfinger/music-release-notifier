@@ -27,7 +27,7 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
     private static final String CREATE_TABLE_RELEASES = "CREATE TABLE "
             + ReleasesContract.ReleasesTable.TABLE_NAME + "(" + ReleasesContract.ReleasesTable.COLUMN_NAME_ID + " TEXT PRIMARY KEY," + ReleasesContract.ReleasesTable.COLUMN_NAME_TITLE
             + " TEXT DEFAULT 'TBA'," + ReleasesContract.ReleasesTable.COLUMN_NAME_ARTIST + " TEXT NOT NULL," + ReleasesContract.ReleasesTable.COLUMN_NAME_DATE + " TEXT DEFAULT 'TBA',"
-            + ReleasesContract.ReleasesTable.COLUMN_NAME_IMAGE + " TEXT" + ")";
+            + ReleasesContract.ReleasesTable.COLUMN_NAME_IMAGE + " TEXT," + ReleasesContract.ReleasesTable.COLUMN_NAME_ARTISTID + " TEXT NOT NULL" + ")";
 
     // create artists table
     private static final String CREATE_TABLE_ARTSITS = "CREATE TABLE "
@@ -75,7 +75,9 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
                     "COALESCE((SELECT " + ReleasesContract.ReleasesTable.COLUMN_NAME_ARTIST + " FROM " + ReleasesContract.ReleasesTable.TABLE_NAME
                     + " WHERE " + ReleasesContract.ReleasesTable.COLUMN_NAME_ID + " = ?), ?), "
                     + "COALESCE(?, 'TBA'), COALESCE((SELECT " + ReleasesContract.ReleasesTable.COLUMN_NAME_IMAGE + " FROM "
-                    + ReleasesContract.ReleasesTable.TABLE_NAME + " WHERE " + ReleasesContract.ReleasesTable.COLUMN_NAME_ID + " = ?), ?));";
+                    + ReleasesContract.ReleasesTable.TABLE_NAME + " WHERE " + ReleasesContract.ReleasesTable.COLUMN_NAME_ID + " = ?), ?), " +
+                    "COALESCE((SELECT " + ReleasesContract.ReleasesTable.COLUMN_NAME_ARTISTID + " FROM " + ReleasesContract.ReleasesTable.TABLE_NAME
+                    + " WHERE " + ReleasesContract.ReleasesTable.COLUMN_NAME_ID + " = ?), ?));";
             SQLiteStatement statement = db.compileStatement(sql);
 
             db.beginTransaction();
@@ -90,6 +92,8 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
                     statement.bindString(6, release.getDate());
                     statement.bindString(7, release.getId());
                     statement.bindString(8, release.getImage());
+                    statement.bindString(9, release.getId());
+                    statement.bindString(10, release.getArtistId());
                     statement.execute();
                     statement.clearBindings();
                 }
@@ -105,15 +109,14 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
         }
     }
 
-
     public Release getRelease(String id){
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(ReleasesContract.ReleasesTable.TABLE_NAME, new String[] {ReleasesContract.ReleasesTable.COLUMN_NAME_ID,
+        Cursor cursor = db.query(ReleasesContract.ReleasesTable.TABLE_NAME, new String[]{ReleasesContract.ReleasesTable.COLUMN_NAME_ID,
                         ReleasesContract.ReleasesTable.COLUMN_NAME_TITLE, ReleasesContract.ReleasesTable.COLUMN_NAME_ARTIST,
-                        ReleasesContract.ReleasesTable.COLUMN_NAME_DATE, ReleasesContract.ReleasesTable.COLUMN_NAME_IMAGE },
+                        ReleasesContract.ReleasesTable.COLUMN_NAME_DATE, ReleasesContract.ReleasesTable.COLUMN_NAME_IMAGE},
                 ReleasesContract.ReleasesTable.COLUMN_NAME_ID + "=?",
-                new String[] { id }, null, null, null, null);
+                new String[]{id}, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
 
@@ -150,23 +153,10 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
         return releaseList;
     }
 
-    /*public int updateRelease(Release release) {
+    public void deleteReleasesByArtist(String id) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put(ReleasesContract.ReleasesTable.COLUMN_NAME_ID, release.getId());
-        values.put(ReleasesContract.ReleasesTable.COLUMN_NAME_TITLE, release.getTitle());
-        values.put(ReleasesContract.ReleasesTable.COLUMN_NAME_ARTIST, release.getArtist());
-        values.put(ReleasesContract.ReleasesTable.COLUMN_NAME_DATE, release.getDate());
-        values.put(ReleasesContract.ReleasesTable.COLUMN_NAME_IMAGE, release.getImage());
-
-        return db.update(ReleasesContract.ReleasesTable.TABLE_NAME, values, ReleasesContract.ReleasesTable.COLUMN_NAME_ID + " = ?", new String[] { release.getId() });
-    }*/
-
-    public void deleteRelease(String id) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        db.delete(ReleasesContract.ReleasesTable.TABLE_NAME, ReleasesContract.ReleasesTable.COLUMN_NAME_ID + " = ?", new String[] { id });
+        db.delete(ReleasesContract.ReleasesTable.TABLE_NAME, ReleasesContract.ReleasesTable.COLUMN_NAME_ARTISTID + " = ?", new String[]{id});
     }
 
     public void deleteAllReleases(){
@@ -213,6 +203,23 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
         } finally {
             db.endTransaction();
         }
+    }
+
+    public boolean isArtistAdded(String id){
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String countQuery = "SELECT  * FROM " + ArtistsContract.ArtistsTable.TABLE_NAME + " WHERE " + ArtistsContract.ArtistsTable.COLUMN_NAME_ID
+                + " = '" + id +"'";
+        Cursor cursor = db.rawQuery(countQuery, null);
+        if(cursor != null && !cursor.isClosed()){
+            if (cursor.getCount() == 0) {
+                cursor.close();
+                return false;
+            }
+            cursor.close();
+        }
+
+        return true;
     }
 
     public Artist getArtist(String id) {

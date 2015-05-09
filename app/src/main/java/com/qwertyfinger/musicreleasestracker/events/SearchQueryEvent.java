@@ -1,17 +1,17 @@
 package com.qwertyfinger.musicreleasestracker.events;
 
-import com.qwertyfinger.musicreleasestracker.misc.SearchResult;
+import com.qwertyfinger.musicreleasestracker.misc.Artist;
 
 import java.util.List;
 
 public class SearchQueryEvent {
-    private List<SearchResult> searchResults;
+    private List<Artist> searchResults;
 
-    public SearchQueryEvent(List<SearchResult> searchResults){
+    public SearchQueryEvent(List<Artist> searchResults){
         this.searchResults = searchResults;
     }
 
-    public List<SearchResult> getSearchResults() {
+    public List<Artist> getSearchResults() {
         return searchResults;
     }
 }
