@@ -68,7 +68,6 @@ public class AddSubscriptions extends AppCompatActivity{
         actionBar.setDisplayShowTitleEnabled(false);
 
         jobManager = App.getInstance().getJobManager();
-        handleIntent(getIntent());
         EventBus.getDefault().register(this);
     }
 
@@ -119,6 +118,7 @@ public class AddSubscriptions extends AppCompatActivity{
                 }
             }
         });
+
         MenuItemCompat.setOnActionExpandListener(search, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
@@ -128,9 +128,14 @@ public class AddSubscriptions extends AppCompatActivity{
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 NavUtils.navigateUpFromSameTask(activity);
+                if (addedArtists != null) {
+                    jobManager.addJobInBackground(new RefreshReleasesJob(activity, Constants.AFTER_ADDING_REFRESH, addedArtists));
+                    jobManager.addJobInBackground(new FetchArtistsJob(activity));
+                }
                 return false;
             }
         });
+
         MenuItemCompat.expandActionView(search);
         return true;
     }
@@ -143,10 +148,6 @@ public class AddSubscriptions extends AppCompatActivity{
     @Override
     protected void onStop(){
         super.onStop();
-        if (addedArtists != null) {
-            jobManager.addJobInBackground(new RefreshReleasesJob(this, Constants.AFTER_ADDING_REFRESH, addedArtists));
-            jobManager.addJobInBackground(new FetchArtistsJob(this));
-        }
     }
 
     @Override
@@ -167,19 +168,15 @@ public class AddSubscriptions extends AppCompatActivity{
 
         empty.setVisibility(View.GONE);
 
-        noResult.setVisibility(View.GONE);
-
         spinner.setVisibility(View.VISIBLE);
     }
 
     public void onEventMainThread(SearchQueryEvent event){
         spinner.setVisibility(View.GONE);
 
-        noResult.setVisibility(View.VISIBLE);
-
         ListView listView = (ListView) findViewById(R.id.list);
         listView.setOnScrollListener(new ListScrollListener(this));
-        listView.setEmptyView(noResult);
+        listView.setEmptyView((TextView) findViewById(R.id.noResult));
         listView.setAdapter(new SearchResultsAdapter(this, event.getSearchResults()));
     }
 
