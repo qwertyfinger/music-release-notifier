@@ -56,11 +56,11 @@ public class SearchResultsAdapter extends ArrayAdapter<Artist> {
         final Artist artist = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.search_result, parent, false);
+            convertView = LayoutInflater.from(context).inflate(R.layout.artist, parent, false);
 
             holder = new ViewHolder();
-            holder.thumbnail = (ImageView) convertView.findViewById(R.id.thumbnail);
-            holder.title = (TextView) convertView.findViewById(R.id.title);
+            holder.thumbnail = (ImageView) convertView.findViewById(R.id.artistImage);
+            holder.title = (TextView) convertView.findViewById(R.id.artistTitle);
             holder.addButton = (ImageButton) convertView.findViewById(R.id.addButton);
             holder.removeButton = (ImageButton) convertView.findViewById(R.id.removeButton);
 

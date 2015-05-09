@@ -8,7 +8,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/list"/>
+        android:id="@+id/releasesList"/>
 
     <TextView android:id="@+id/noReleases"
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
         android:gravity="center"
         android:textSize="20sp"/>
 
-    <TextView android:id="@+id/noArtists"
+    <TextView android:id="@+id/noArtistsInRel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/noSubscriptions"

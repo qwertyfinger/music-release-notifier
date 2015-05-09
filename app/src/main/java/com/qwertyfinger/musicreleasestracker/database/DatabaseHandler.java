@@ -153,6 +153,23 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
         return releaseList;
     }
 
+    public boolean isThereReleaseByArtist(String artistId){
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String countQuery = "SELECT  * FROM " + ReleasesContract.ReleasesTable.TABLE_NAME + " WHERE " + ReleasesContract.ReleasesTable.COLUMN_NAME_ARTISTID
+                + " = '" + artistId +"'";
+        Cursor cursor = db.rawQuery(countQuery, null);
+        if(cursor != null && !cursor.isClosed()){
+            if (cursor.getCount() == 0) {
+                cursor.close();
+                return false;
+            }
+            cursor.close();
+        }
+
+        return true;
+    }
+
     public void deleteReleasesByArtist(String id) {
         SQLiteDatabase db = this.getWritableDatabase();
 

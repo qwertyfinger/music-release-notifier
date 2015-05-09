@@ -88,8 +88,7 @@ public class AddSubscriptions extends AppCompatActivity{
             SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this, MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
             suggestions.saveRecentQuery(query, null);
 
-            if (query.trim().length() > 1)
-                jobManager.addJobInBackground(new SearchArtistJob(query));
+            jobManager.addJobInBackground(new SearchArtistJob(query));
         }
     }
 
@@ -174,7 +173,7 @@ public class AddSubscriptions extends AppCompatActivity{
     public void onEventMainThread(SearchQueryEvent event){
         spinner.setVisibility(View.GONE);
 
-        ListView listView = (ListView) findViewById(R.id.list);
+        ListView listView = (ListView) findViewById(R.id.searchList);
         listView.setOnScrollListener(new ListScrollListener(this));
         listView.setEmptyView((TextView) findViewById(R.id.noResult));
         listView.setAdapter(new SearchResultsAdapter(this, event.getSearchResults()));

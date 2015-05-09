@@ -15,4 +15,6 @@
     <string name="controlButtonDescription">controlButton</string>
     <string name="controlRemoveDescription">Remove artist from subscriptions</string>
     <string name="controlAddDescription">Subscribe to this artist</string>
+    <string name="undo_message">Deleted</string>
+    <string name="undo">Undo</string>
 </resources>

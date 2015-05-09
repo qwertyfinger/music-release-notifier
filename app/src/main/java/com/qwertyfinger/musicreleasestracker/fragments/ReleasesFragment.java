@@ -46,13 +46,13 @@ public class ReleasesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_releases, container, false);
 
-        mNoArtists = (TextView) view.findViewById(R.id.noArtists);
+        mNoArtists = (TextView) view.findViewById(R.id.noArtistsInRel);
         mNoReleases = (TextView) view.findViewById(R.id.noReleases);
         mNoArtists.setVisibility(View.GONE);
 
         jobManager.addJobInBackground(new FetchReleasesJob(getActivity()));
 
-        mStickyList = (StickyListHeadersListView) view.findViewById(R.id.list);
+        mStickyList = (StickyListHeadersListView) view.findViewById(R.id.releasesList);
         mStickyList.setOnScrollListener(new ListScrollListener(getActivity()));
         mStickyList.setAreHeadersSticky(false);
 

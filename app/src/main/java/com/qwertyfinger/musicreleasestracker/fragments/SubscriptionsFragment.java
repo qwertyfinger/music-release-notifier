@@ -45,7 +45,7 @@ public class SubscriptionsFragment extends Fragment {
 
         jobManager.addJobInBackground(new FetchArtistsJob(getActivity()));
 
-        mStickyList = (StickyListHeadersListView) view.findViewById(R.id.list);
+        mStickyList = (StickyListHeadersListView) view.findViewById(R.id.artistsList);
         mStickyList.setOnScrollListener(new ListScrollListener(getActivity()));
         mStickyList.setAreHeadersSticky(false);
 

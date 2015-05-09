@@ -40,7 +40,6 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
         public ImageView thumbnail;
         public TextView title;
         public TextView artist;
-        public TextView date;
     }
 
     class HeaderViewHolder {
@@ -57,10 +56,9 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
             convertView = LayoutInflater.from(context).inflate(R.layout.release, parent, false);
 
             holder = new ViewHolder();
-            holder.thumbnail = (ImageView) convertView.findViewById(R.id.thumbnail);
-            holder.title = (TextView) convertView.findViewById(R.id.title);
+            holder.thumbnail = (ImageView) convertView.findViewById(R.id.releaseCover);
+            holder.title = (TextView) convertView.findViewById(R.id.releaseTitle);
             holder.artist = (TextView) convertView.findViewById(R.id.artist);
-            holder.date = (TextView) convertView.findViewById(R.id.date);
 
             convertView.setTag(holder);
         } else {
@@ -68,8 +66,7 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
         }
 
         holder.title.setText(release.getTitle());
-        holder.artist.setText(release.getArtist());
-        holder.date.setText(dates[position]);
+        holder.artist.setText("by " + release.getArtist());
 
         File thumbnail = context.getFileStreamPath(release.getImage());
 
@@ -89,7 +86,7 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
         if (convertView == null) {
             holder = new HeaderViewHolder();
             convertView = LayoutInflater.from(context).inflate(R.layout.releases_header, parent, false);
-            holder.header = (TextView) convertView.findViewById(R.id.header);
+            holder.header = (TextView) convertView.findViewById(R.id.releaseHeader);
             convertView.setTag(holder);
         } else {
             holder = (HeaderViewHolder) convertView.getTag();

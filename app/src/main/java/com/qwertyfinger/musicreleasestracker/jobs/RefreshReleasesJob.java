@@ -224,10 +224,7 @@ public class RefreshReleasesJob extends Job{
     public void onEventMainThread(ReleasesLoadedEvent event){
         if (!resultForDatabase.isEmpty()) {
             db.addReleases(resultForDatabase);
-            if (actionId == Constants.EXPLICIT_REFRESH)
-                EventBus.getDefault().post(new ReleasesChangedEvent(Constants.EXPLICIT_REFRESH));
-            if (actionId == Constants.AFTER_ADDING_REFRESH)
-                EventBus.getDefault().post(new ReleasesChangedEvent(Constants.AFTER_ADDING_REFRESH));
+            EventBus.getDefault().post(new ReleasesChangedEvent());
         }
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this);

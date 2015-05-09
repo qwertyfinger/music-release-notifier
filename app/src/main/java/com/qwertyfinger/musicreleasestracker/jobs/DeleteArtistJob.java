@@ -8,6 +8,7 @@ import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasestracker.Constants;
 import com.qwertyfinger.musicreleasestracker.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasestracker.events.ArtistDeletedEvent;
+import com.qwertyfinger.musicreleasestracker.events.ReleasesChangedEvent;
 import com.qwertyfinger.musicreleasestracker.misc.Artist;
 
 import de.greenrobot.event.EventBus;
@@ -34,7 +35,10 @@ public class DeleteArtistJob extends Job {
     public void onRun() throws Throwable {
         DatabaseHandler db = DatabaseHandler.getInstance(context);
         db.deleteArtist(artist.getId());
-        db.deleteReleasesByArtist(artist.getId());
+        if (db.isThereReleaseByArtist(artist.getId())) {
+            db.deleteReleasesByArtist(artist.getId());
+            EventBus.getDefault().post(new ReleasesChangedEvent());
+        }
         context.deleteFile(artist.getId() + ".jpg");
         EventBus.getDefault().post(new ArtistDeletedEvent(view, artist));
     }

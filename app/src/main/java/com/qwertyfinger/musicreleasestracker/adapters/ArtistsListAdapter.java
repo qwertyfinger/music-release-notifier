@@ -5,10 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.path.android.jobqueue.JobManager;
+import com.qwertyfinger.musicreleasestracker.App;
 import com.qwertyfinger.musicreleasestracker.R;
+import com.qwertyfinger.musicreleasestracker.jobs.DeleteArtistJob;
 import com.qwertyfinger.musicreleasestracker.misc.Artist;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -22,10 +26,12 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
 
     private String[] artists;
     private final Context context;
+    private JobManager jobManager;
 
     public ArtistsListAdapter(Context context, List<Artist> artists) {
         super(context, 0, artists);
         this.context = context;
+        jobManager = App.getInstance().getJobManager();
         this.artists = new String[artists.size()];
         for (int i = 0; i < artists.size(); i++){
             this.artists[i] = artists.get(i).getTitle();
@@ -35,6 +41,7 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
     class ViewHolder {
         public ImageView thumbnail;
         public TextView title;
+        public ImageButton removeButton;
     }
 
     class HeaderViewHolder {
@@ -48,18 +55,29 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
         final Artist artist = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.release, parent, false);
+            convertView = LayoutInflater.from(context).inflate(R.layout.artist, parent, false);
 
             holder = new ViewHolder();
-            holder.thumbnail = (ImageView) convertView.findViewById(R.id.thumbnail);
-            holder.title = (TextView) convertView.findViewById(R.id.title);
+            holder.thumbnail = (ImageView) convertView.findViewById(R.id.artistImage);
+            holder.title = (TextView) convertView.findViewById(R.id.artistTitle);
+            holder.removeButton = (ImageButton) convertView.findViewById(R.id.removeButton);
 
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
+        convertView.findViewById(R.id.addButton).setVisibility(View.GONE);
         holder.title.setText(artist.getTitle());
+
+        final View view = convertView;
+
+        holder.removeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                jobManager.addJobInBackground(new DeleteArtistJob(context, artist, view));
+            }
+        });
 
         File thumbnail = context.getFileStreamPath(artist.getImage());
 
@@ -78,8 +96,8 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
         HeaderViewHolder holder;
         if (convertView == null) {
             holder = new HeaderViewHolder();
-            convertView = LayoutInflater.from(context).inflate(R.layout.releases_header, parent, false);
-            holder.header = (TextView) convertView.findViewById(R.id.header);
+            convertView = LayoutInflater.from(context).inflate(R.layout.artists_header, parent, false);
+            holder.header = (TextView) convertView.findViewById(R.id.artistHeader);
             convertView.setTag(holder);
         } else {
             holder = (HeaderViewHolder) convertView.getTag();

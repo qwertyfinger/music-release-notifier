@@ -37,7 +37,7 @@ public class EmptyReleasesJob extends Job{
             }
 
             db.deleteAllReleases();
-            EventBus.getDefault().post(new ReleasesChangedEvent(Constants.AFTER_ADDING_REFRESH));
+            EventBus.getDefault().post(new ReleasesChangedEvent());
         }
     }
 
