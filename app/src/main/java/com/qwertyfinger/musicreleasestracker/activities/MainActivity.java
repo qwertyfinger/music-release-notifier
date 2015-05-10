@@ -14,8 +14,6 @@ import com.qwertyfinger.musicreleasestracker.App;
 import com.qwertyfinger.musicreleasestracker.Constants;
 import com.qwertyfinger.musicreleasestracker.R;
 import com.qwertyfinger.musicreleasestracker.adapters.MyFragmentPagerAdapter;
-import com.qwertyfinger.musicreleasestracker.jobs.EmptyArtistsJob;
-import com.qwertyfinger.musicreleasestracker.jobs.EmptyReleasesJob;
 import com.qwertyfinger.musicreleasestracker.jobs.RefreshReleasesJob;
 
 
@@ -86,14 +84,8 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_refresh:
                 jobManager.addJobInBackground(new RefreshReleasesJob(this, Constants.EXPLICIT_REFRESH));
                 return true;
-            case R.id.action_empty_artists:
-                jobManager.addJobInBackground(new EmptyArtistsJob(this));
-                return true;
-            case R.id.action_empty_releases:
-                jobManager.addJobInBackground(new EmptyReleasesJob(this));
-                return true;
-
-            default: return super.onOptionsItemSelected(item);
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

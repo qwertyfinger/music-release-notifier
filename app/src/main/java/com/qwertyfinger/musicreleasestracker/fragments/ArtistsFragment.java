@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -15,6 +18,7 @@ import com.qwertyfinger.musicreleasestracker.adapters.ArtistsListAdapter;
 import com.qwertyfinger.musicreleasestracker.events.ArtistDeletedEvent;
 import com.qwertyfinger.musicreleasestracker.events.ArtistsFetchedEvent;
 import com.qwertyfinger.musicreleasestracker.events.NoArtistsEvent;
+import com.qwertyfinger.musicreleasestracker.jobs.EmptyArtistsJob;
 import com.qwertyfinger.musicreleasestracker.jobs.FetchArtistsJob;
 import com.qwertyfinger.musicreleasestracker.misc.Artist;
 import com.qwertyfinger.musicreleasestracker.misc.ListScrollListener;
@@ -37,6 +41,7 @@ public class ArtistsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         EventBus.getDefault().register(this);
         jobManager = App.getInstance().getJobManager();
     }
@@ -92,6 +97,22 @@ public class ArtistsFragment extends Fragment {
             mStickyList.onRestoreInstanceState(state);
 
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.artists_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_empty_artists:
+                jobManager.addJobInBackground(new EmptyArtistsJob(getActivity()));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
