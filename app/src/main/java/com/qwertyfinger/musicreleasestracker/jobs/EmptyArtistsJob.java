@@ -8,7 +8,7 @@ import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasestracker.App;
 import com.qwertyfinger.musicreleasestracker.Constants;
 import com.qwertyfinger.musicreleasestracker.database.DatabaseHandler;
-import com.qwertyfinger.musicreleasestracker.events.ArtistDeletedEvent;
+import com.qwertyfinger.musicreleasestracker.events.NoArtistsEvent;
 import com.qwertyfinger.musicreleasestracker.misc.Artist;
 
 import java.util.List;
@@ -42,7 +42,7 @@ public class EmptyArtistsJob extends Job {
             }
 
             db.deleteAllArtists();
-            EventBus.getDefault().post(new ArtistDeletedEvent());
+            EventBus.getDefault().post(new NoArtistsEvent());
             jobManager.addJobInBackground(new EmptyReleasesJob(context));
         }
     }

@@ -49,13 +49,13 @@ public class RefreshReleasesJob extends Job{
     private List<Release> resultForDatabase;
 
     public RefreshReleasesJob(Context context, int actionId) {
-        super(new Params(Constants.JOB_PRIORITY_CRITICAL).requireNetwork().groupBy(Constants.JOB_GROUP_DATABASE));
+        super(new Params(Constants.JOB_PRIORITY_LOW).requireNetwork().groupBy(Constants.JOB_GROUP_DATABASE));
         this.context = context;
         this.actionId = actionId;
     }
 
     public RefreshReleasesJob(Context context, int actionId, List<Artist> addedArtists) {
-        super(new Params(Constants.JOB_PRIORITY_CRITICAL).requireNetwork().groupBy(Constants.JOB_GROUP_DATABASE));
+        super(new Params(Constants.JOB_PRIORITY_LOW).requireNetwork().groupBy(Constants.JOB_GROUP_DATABASE));
         this.context = context;
         this.actionId = actionId;
         this.addedArtists = addedArtists;

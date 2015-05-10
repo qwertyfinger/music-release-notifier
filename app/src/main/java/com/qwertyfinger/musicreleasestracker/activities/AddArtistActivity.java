@@ -47,7 +47,7 @@ import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class AddSubscriptions extends AppCompatActivity{
+public class AddArtistActivity extends AppCompatActivity{
 
     private List<Artist> addedArtists = null;
     private JobManager jobManager;
@@ -64,7 +64,7 @@ public class AddSubscriptions extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_add_subscriptions);
+        setContentView(R.layout.activity_add_artists);
 
         if (savedInstanceState != null) {
             empty = (TextView) findViewById(R.id.empty);
@@ -135,9 +135,8 @@ public class AddSubscriptions extends AppCompatActivity{
             noResult.setVisibility(View.GONE);
         }
 
-        if(state != null) {
+        if(state != null)
             listView.onRestoreInstanceState(state);
-        }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
@@ -170,7 +169,7 @@ public class AddSubscriptions extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        getMenuInflater().inflate(R.menu.menu_add_subscriptions, menu);
+        getMenuInflater().inflate(R.menu.menu_add_artists, menu);
         MenuItem search = menu.findItem(R.id.subscriptions_search);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -206,8 +205,8 @@ public class AddSubscriptions extends AppCompatActivity{
 
                 if (addedArtists != null) {
                     if (!addedArtists.isEmpty()) {
-                        jobManager.addJobInBackground(new RefreshReleasesJob(activity, Constants.AFTER_ADDING_REFRESH, addedArtists));
                         jobManager.addJobInBackground(new FetchArtistsJob(activity));
+                        jobManager.addJobInBackground(new RefreshReleasesJob(activity, Constants.AFTER_ADDING_REFRESH, addedArtists));
                     }
                 }
                 return false;
@@ -307,29 +306,6 @@ public class AddSubscriptions extends AppCompatActivity{
 
         super.onSaveInstanceState(savedInstanceState);
     }
-
-    /*@Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
-        searchQuery = savedInstanceState.getCharSequence("searchQuery");
-
-        int listSize = savedInstanceState.getInt("listSize");
-        if (listSize != -1) {
-            if (listSize > 0) {
-                List<String> ids = savedInstanceState.getStringArrayList("ids");
-                List<String> titles = savedInstanceState.getStringArrayList("titles");
-                List<String> images = savedInstanceState.getStringArrayList("images");
-
-                if (addedArtists == null)
-                    addedArtists = new ArrayList<>();
-
-                for (int i = 0; i < savedInstanceState.getInt("listSize"); i++) {
-                    addedArtists.add(i, new Artist(ids.get(i), titles.get(i), images.get(i)));
-                }
-            }
-        }
-    }*/
 
     public void onEventMainThread(SearchingEvent event){
         empty.setVisibility(View.GONE);

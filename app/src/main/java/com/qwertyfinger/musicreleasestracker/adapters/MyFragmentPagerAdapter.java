@@ -4,8 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.qwertyfinger.musicreleasestracker.fragments.ArtistsFragment;
 import com.qwertyfinger.musicreleasestracker.fragments.ReleasesFragment;
-import com.qwertyfinger.musicreleasestracker.fragments.SubscriptionsFragment;
 
 public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
     final int PAGE_COUNT = 2;
@@ -22,7 +22,7 @@ public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return (position == 0)? new ReleasesFragment() : new SubscriptionsFragment();
+        return (position == 0)? new ReleasesFragment() : new ArtistsFragment();
     }
 
     @Override

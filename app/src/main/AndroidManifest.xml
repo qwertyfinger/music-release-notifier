@@ -25,7 +25,7 @@
                 android:value="com.qwertyfinger.musicreleasestracker.activities.MainActivity" />
         </activity>
         <activity
-            android:name=".activities.AddSubscriptions"
+            android:name=".activities.AddArtistActivity"
             android:label="@string/title_activity_add_subscriptions"
             android:launchMode="singleTop"
             android:parentActivityName=".activities.MainActivity" >

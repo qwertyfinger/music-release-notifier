@@ -24,7 +24,7 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyListHeadersAdapter {
 
-    private String[] artists;
+    private List<Artist> artists;
     private final Context context;
     private JobManager jobManager;
 
@@ -32,10 +32,7 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
         super(context, 0, artists);
         this.context = context;
         jobManager = App.getInstance().getJobManager();
-        this.artists = new String[artists.size()];
-        for (int i = 0; i < artists.size(); i++){
-            this.artists[i] = artists.get(i).getTitle();
-        }
+        this.artists = artists;
     }
 
     private class ViewHolder {
@@ -103,7 +100,7 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
             holder = (HeaderViewHolder) convertView.getTag();
         }
 
-        String headerText = "" + artists[position].subSequence(0, 1).charAt(0);
+        String headerText = "" + artists.get(position).getTitle().subSequence(0, 1).charAt(0);
         holder.header.setText(headerText);
 
         return convertView;
@@ -111,6 +108,6 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
 
     @Override
     public long getHeaderId(int position) {
-        return artists[position].subSequence(0, 1).charAt(0);
+        return artists.get(position).getTitle().subSequence(0, 1).charAt(0);
     }
 }

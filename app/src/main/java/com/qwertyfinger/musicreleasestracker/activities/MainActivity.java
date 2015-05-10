@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()){
             case R.id.action_add_subscription:
-                startActivity(new Intent(this, AddSubscriptions.class));
+                startActivity(new Intent(this, AddArtistActivity.class));
                 return true;
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));

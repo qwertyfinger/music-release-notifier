@@ -24,16 +24,13 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class ReleasesListAdapter extends ArrayAdapter<Release> implements StickyListHeadersAdapter {
 
-    private String[] dates;
+    private List<Release> releases;
     private final Context context;
 
     public ReleasesListAdapter(Context context, List<Release> releases) {
         super(context, 0, releases);
         this.context = context;
-        dates = new String[releases.size()];
-        for (int i = 0; i < releases.size(); i++){
-            dates[i] = releases.get(i).getDate();
-        }
+        this.releases = releases;
     }
 
     private class ViewHolder {
@@ -92,7 +89,7 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
             holder = (HeaderViewHolder) convertView.getTag();
         }
 
-        String headerText = "" + dates[position];
+        String headerText = "" + releases.get(position).getDate();
         holder.header.setText(headerText);
 
         return convertView;
@@ -104,7 +101,7 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
         Date date = null;
 
         try {
-            date = formatter.parse(dates[position]);
+            date = formatter.parse(releases.get(position).getDate());
         } catch (ParseException e) {}
 
         Calendar calendar = Calendar.getInstance();

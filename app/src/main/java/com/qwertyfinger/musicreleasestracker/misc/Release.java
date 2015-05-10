@@ -1,7 +1,9 @@
 package com.qwertyfinger.musicreleasestracker.misc;
 
+import android.support.annotation.NonNull;
+
+import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -52,15 +54,15 @@ public class Release implements Comparable<Release> {
     }
 
     @Override
-    public int compareTo(Release other) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+    public int compareTo(@NonNull Release other) {
+        DateFormat formatter = DateFormat.getDateInstance(DateFormat.LONG);
         Date date1 = Calendar.getInstance().getTime();
         Date date2 = date1;
         try {
             date1 = formatter.parse(other.getDate());
             date2 = formatter.parse(releaseDate);
-        } catch (ParseException e) {
-        }
+        } catch (ParseException e) {}
+
         if (date2.after(date1)) return 1;
         if (date2.before(date1)) return -1;
         if (title.subSequence(0, 1).charAt(0) > other.getTitle().subSequence(0, 1).charAt(0)) return 1;

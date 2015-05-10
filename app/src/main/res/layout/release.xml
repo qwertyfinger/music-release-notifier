@@ -27,6 +27,7 @@
         android:layout_toEndOf="@id/releaseCover"
         android:layout_toRightOf="@id/releaseCover"
         android:textSize="14sp"
+        android:textColor="@color/silver"
         android:paddingLeft="20dp"/>
 
 </RelativeLayout>
