@@ -43,7 +43,7 @@ public class SearchResultsAdapter extends ArrayAdapter<Artist> {
         EventBus.getDefault().register(this);
     }
 
-    class ViewHolder {
+    private class ViewHolder {
         public ImageView thumbnail;
         public TextView title;
         public ImageButton addButton;
@@ -83,14 +83,22 @@ public class SearchResultsAdapter extends ArrayAdapter<Artist> {
             holder.addButton.setVisibility(View.GONE);
             holder.removeButton.setVisibility(View.VISIBLE);
 
-            File thumbnail = context.getFileStreamPath(db.getArtist(artist.getId()).getImage());
+            File thumbnail = context.getFileStreamPath(artist.getId() + ".jpg");
 
             Picasso.with(context)
                     .load(thumbnail)
                     .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                     .error(R.drawable.no_image)
                     .tag(context)
-                    .into(holder.thumbnail);
+                    .into(holder.thumbnail, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                        }
+
+                        @Override
+                        public void onError() {
+                        }
+                    });
         }
         else {
             holder.removeButton.setVisibility(View.GONE);

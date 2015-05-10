@@ -36,7 +36,7 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
         }
     }
 
-    class ViewHolder {
+    private class ViewHolder {
         public ImageView thumbnail;
         public TextView title;
         public TextView artist;
@@ -58,7 +58,7 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
             holder = new ViewHolder();
             holder.thumbnail = (ImageView) convertView.findViewById(R.id.releaseCover);
             holder.title = (TextView) convertView.findViewById(R.id.releaseTitle);
-            holder.artist = (TextView) convertView.findViewById(R.id.artist);
+            holder.artist = (TextView) convertView.findViewById(R.id.artistName);
 
             convertView.setTag(holder);
         } else {

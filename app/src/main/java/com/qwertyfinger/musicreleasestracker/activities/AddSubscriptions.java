@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
@@ -52,17 +53,91 @@ public class AddSubscriptions extends AppCompatActivity{
     private JobManager jobManager;
     private ProgressBar spinner;
     private TextView noResult;
+    private TextView empty;
+    private SearchView searchView;
+    private ListView listView;
+    private Parcelable state;
+    private List<Artist> searchResults;
+    private CharSequence searchQuery = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_add_subscriptions);
 
-        spinner = (ProgressBar)findViewById(R.id.progressBar);
-        spinner.setVisibility(View.GONE);
+        if (savedInstanceState != null) {
+            empty = (TextView) findViewById(R.id.empty);
+            if (savedInstanceState.getInt("emptyVisibility") == View.VISIBLE)
+                empty.setVisibility(View.VISIBLE);
+            else
+                empty.setVisibility(View.GONE);
 
-        noResult = (TextView) findViewById(R.id.noResult);
-        noResult.setVisibility(View.GONE);
+            spinner = (ProgressBar) findViewById(R.id.progressBar);
+            if (savedInstanceState.getInt("spinnerVisibility") == View.VISIBLE)
+                    spinner.setVisibility(View.VISIBLE);
+            else
+                    spinner.setVisibility(View.GONE);
+
+            noResult = (TextView) findViewById(R.id.noResult);
+            if (savedInstanceState.getInt("noResultVisibility") == View.VISIBLE)
+                    noResult.setVisibility(View.VISIBLE);
+            else
+                    noResult.setVisibility(View.GONE);
+
+            listView = (ListView) findViewById(R.id.searchList);
+            listView.setOnScrollListener(new ListScrollListener(this));
+            listView.setEmptyView((TextView) findViewById(R.id.noResult));
+
+            searchQuery = savedInstanceState.getCharSequence("searchQuery");
+
+            int addedListSize = savedInstanceState.getInt("addedListSize");
+            if (addedListSize != -1) {
+                if (addedListSize > 0) {
+                    List<String> ids = savedInstanceState.getStringArrayList("ids");
+                    List<String> titles = savedInstanceState.getStringArrayList("titles");
+                    List<String> images = savedInstanceState.getStringArrayList("images");
+
+                    if (addedArtists == null)
+                        addedArtists = new ArrayList<>();
+
+                    for (int i = 0; i < savedInstanceState.getInt("addedListSize"); i++) {
+                        addedArtists.add(i, new Artist(ids.get(i), titles.get(i), images.get(i)));
+                    }
+                }
+            }
+
+            int searchListSize = savedInstanceState.getInt("searchListSize");
+            if (searchListSize != -1) {
+                if (searchListSize > 0) {
+                    List<String> ids = savedInstanceState.getStringArrayList("ids2");
+                    List<String> titles = savedInstanceState.getStringArrayList("titles2");
+                    List<String> images = savedInstanceState.getStringArrayList("images2");
+
+                    if (searchResults == null)
+                        searchResults = new ArrayList<>();
+
+                    for (int i = 0; i < savedInstanceState.getInt("searchListSize"); i++) {
+                        searchResults.add(i, new Artist(ids.get(i), titles.get(i), images.get(i)));
+                    }
+                    listView.setAdapter(new SearchResultsAdapter(this, searchResults));
+                }
+            }
+        }
+
+        else {
+            empty = (TextView) findViewById(R.id.empty);
+
+            spinner = (ProgressBar)findViewById(R.id.progressBar);
+            spinner.setVisibility(View.GONE);
+
+            noResult = (TextView) findViewById(R.id.noResult);
+            noResult.setVisibility(View.GONE);
+        }
+
+        if(state != null) {
+            listView.onRestoreInstanceState(state);
+        }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
@@ -94,11 +169,12 @@ public class AddSubscriptions extends AppCompatActivity{
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         getMenuInflater().inflate(R.menu.menu_add_subscriptions, menu);
         MenuItem search = menu.findItem(R.id.subscriptions_search);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
+        searchView = (SearchView) MenuItemCompat.getActionView(search);
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setSubmitButtonEnabled(true);
@@ -127,15 +203,19 @@ public class AddSubscriptions extends AppCompatActivity{
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 NavUtils.navigateUpFromSameTask(activity);
+
                 if (addedArtists != null) {
-                    jobManager.addJobInBackground(new RefreshReleasesJob(activity, Constants.AFTER_ADDING_REFRESH, addedArtists));
-                    jobManager.addJobInBackground(new FetchArtistsJob(activity));
+                    if (!addedArtists.isEmpty()) {
+                        jobManager.addJobInBackground(new RefreshReleasesJob(activity, Constants.AFTER_ADDING_REFRESH, addedArtists));
+                        jobManager.addJobInBackground(new FetchArtistsJob(activity));
+                    }
                 }
                 return false;
             }
         });
 
         MenuItemCompat.expandActionView(search);
+        searchView.setQuery(searchQuery, false);
         return true;
     }
 
@@ -162,21 +242,110 @@ public class AddSubscriptions extends AppCompatActivity{
             EventBus.getDefault().unregister(this);
     }
 
-    public void onEventMainThread(SearchingEvent event){
-        TextView empty = (TextView) findViewById(R.id.empty);
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        if (listView != null)
+            state = listView.onSaveInstanceState();
 
+        if (spinner != null)
+            savedInstanceState.putInt("spinnerVisibility", spinner.getVisibility());
+
+        if (empty != null)
+            savedInstanceState.putInt("emptyVisibility", empty.getVisibility());
+
+        if (noResult != null)
+            savedInstanceState.putInt("noResultVisibility", noResult.getVisibility());
+
+        if (searchView != null)
+            savedInstanceState.putCharSequence("searchQuery", searchView.getQuery());
+        else
+            savedInstanceState.putCharSequence("searchQuery", "");
+
+        if (addedArtists != null) {
+            savedInstanceState.putInt("addedListSize", addedArtists.size());
+
+            if (addedArtists.size() > 0) {
+                ArrayList<String> ids = new ArrayList<>();
+                ArrayList<String> titles = new ArrayList<>();
+                ArrayList<String> images = new ArrayList<>();
+
+                for (int i = 0; i < addedArtists.size(); i++) {
+                    ids.add(i, addedArtists.get(i).getId());
+                    titles.add(i, addedArtists.get(i).getTitle());
+                    images.add(i, addedArtists.get(i).getImage());
+                }
+
+                savedInstanceState.putStringArrayList("ids", ids);
+                savedInstanceState.putStringArrayList("titles", titles);
+                savedInstanceState.putStringArrayList("images", images);
+            }
+        }
+        else
+            savedInstanceState.putInt("addedListSize", -1);
+
+        if (searchResults != null) {
+            savedInstanceState.putInt("searchListSize", searchResults.size());
+
+            if (searchResults.size() > 0) {
+                ArrayList<String> ids = new ArrayList<>();
+                ArrayList<String> titles = new ArrayList<>();
+                ArrayList<String> images = new ArrayList<>();
+
+                for (int i = 0; i < searchResults.size(); i++) {
+                    ids.add(i, searchResults.get(i).getId());
+                    titles.add(i, searchResults.get(i).getTitle());
+                    images.add(i, searchResults.get(i).getImage());
+                }
+
+                savedInstanceState.putStringArrayList("ids2", ids);
+                savedInstanceState.putStringArrayList("titles2", titles);
+                savedInstanceState.putStringArrayList("images2", images);
+            }
+        }
+        else
+            savedInstanceState.putInt("searchListSize", -1);
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    /*@Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        searchQuery = savedInstanceState.getCharSequence("searchQuery");
+
+        int listSize = savedInstanceState.getInt("listSize");
+        if (listSize != -1) {
+            if (listSize > 0) {
+                List<String> ids = savedInstanceState.getStringArrayList("ids");
+                List<String> titles = savedInstanceState.getStringArrayList("titles");
+                List<String> images = savedInstanceState.getStringArrayList("images");
+
+                if (addedArtists == null)
+                    addedArtists = new ArrayList<>();
+
+                for (int i = 0; i < savedInstanceState.getInt("listSize"); i++) {
+                    addedArtists.add(i, new Artist(ids.get(i), titles.get(i), images.get(i)));
+                }
+            }
+        }
+    }*/
+
+    public void onEventMainThread(SearchingEvent event){
         empty.setVisibility(View.GONE);
 
         spinner.setVisibility(View.VISIBLE);
     }
 
-    public void onEventMainThread(SearchQueryEvent event){
+    public void onEventMainThread(SearchQueryEvent event) {
         spinner.setVisibility(View.GONE);
 
-        ListView listView = (ListView) findViewById(R.id.searchList);
+        searchResults = event.getSearchResults();
+
+        listView = (ListView) findViewById(R.id.searchList);
         listView.setOnScrollListener(new ListScrollListener(this));
         listView.setEmptyView((TextView) findViewById(R.id.noResult));
-        listView.setAdapter(new SearchResultsAdapter(this, event.getSearchResults()));
+        listView.setAdapter(new SearchResultsAdapter(this, searchResults));
     }
 
     public void onEventMainThread(ArtistAddedEvent event) {

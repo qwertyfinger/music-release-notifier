@@ -38,7 +38,7 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
         }
     }
 
-    class ViewHolder {
+    private class ViewHolder {
         public ImageView thumbnail;
         public TextView title;
         public ImageButton removeButton;

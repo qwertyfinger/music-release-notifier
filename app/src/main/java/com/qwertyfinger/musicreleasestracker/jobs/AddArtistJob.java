@@ -28,7 +28,7 @@ public class AddArtistJob extends Job{
     private final Context context;
     private final Artist artist;
     private Target target;
-    private View view;
+    private final View view;
 
     public AddArtistJob(Context c, Artist artist, View view) {
         super(new Params(Constants.JOB_PRIORITY_LOW).groupBy(Constants.JOB_GROUP_DATABASE));
@@ -58,8 +58,7 @@ public class AddArtistJob extends Job{
                     e.printStackTrace();
                 }
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
-                artist.setImage(filename);
-                db.addArtist(artist);
+                db.addArtist(new Artist(artist.getId(), artist.getTitle(), filename));
                 EventBus.getDefault().post(new ArtistAddedEvent(artist, view));
             }
 
