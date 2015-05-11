@@ -1,6 +1,6 @@
 package com.qwertyfinger.musicreleasetracker.events;
 
-import com.qwertyfinger.musicreleasetracker.misc.Artist;
+import com.qwertyfinger.musicreleasetracker.entities.Artist;
 
 import java.util.List;
 

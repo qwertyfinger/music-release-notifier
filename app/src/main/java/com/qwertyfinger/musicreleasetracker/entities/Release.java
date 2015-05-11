@@ -1,4 +1,4 @@
-package com.qwertyfinger.musicreleasetracker.misc;
+package com.qwertyfinger.musicreleasetracker.entities;
 
 import android.support.annotation.NonNull;
 

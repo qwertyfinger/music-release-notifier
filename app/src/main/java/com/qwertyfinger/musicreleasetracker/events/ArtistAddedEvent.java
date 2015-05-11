@@ -2,7 +2,7 @@ package com.qwertyfinger.musicreleasetracker.events;
 
 import android.view.View;
 
-import com.qwertyfinger.musicreleasetracker.misc.Artist;
+import com.qwertyfinger.musicreleasetracker.entities.Artist;
 
 public class ArtistAddedEvent {
 

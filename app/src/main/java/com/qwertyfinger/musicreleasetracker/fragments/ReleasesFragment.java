@@ -14,13 +14,13 @@ import com.qwertyfinger.musicreleasetracker.App;
 import com.qwertyfinger.musicreleasetracker.R;
 import com.qwertyfinger.musicreleasetracker.adapters.ReleasesListAdapter;
 import com.qwertyfinger.musicreleasetracker.database.DatabaseHandler;
+import com.qwertyfinger.musicreleasetracker.entities.Release;
 import com.qwertyfinger.musicreleasetracker.events.NoArtistsEvent;
 import com.qwertyfinger.musicreleasetracker.events.NoReleasesEvent;
 import com.qwertyfinger.musicreleasetracker.events.ReleasesChangedEvent;
 import com.qwertyfinger.musicreleasetracker.events.ReleasesFetchedEvent;
 import com.qwertyfinger.musicreleasetracker.jobs.FetchReleasesJob;
 import com.qwertyfinger.musicreleasetracker.misc.ListScrollListener;
-import com.qwertyfinger.musicreleasetracker.misc.Release;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -13,9 +13,9 @@ import android.widget.TextView;
 import com.path.android.jobqueue.JobManager;
 import com.qwertyfinger.musicreleasetracker.App;
 import com.qwertyfinger.musicreleasetracker.R;
+import com.qwertyfinger.musicreleasetracker.entities.Artist;
 import com.qwertyfinger.musicreleasetracker.jobs.DeleteArtistJob;
-import com.qwertyfinger.musicreleasetracker.misc.Artist;
-import com.qwertyfinger.musicreleasetracker.util.Utils;
+import com.qwertyfinger.musicreleasetracker.misc.Utils;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 

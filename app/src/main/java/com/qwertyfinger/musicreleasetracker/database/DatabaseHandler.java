@@ -7,9 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 
+import com.qwertyfinger.musicreleasetracker.entities.Artist;
+import com.qwertyfinger.musicreleasetracker.entities.Release;
 import com.qwertyfinger.musicreleasetracker.events.ArtistExistsEvent;
-import com.qwertyfinger.musicreleasetracker.misc.Artist;
-import com.qwertyfinger.musicreleasetracker.misc.Release;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -18,7 +18,7 @@ import com.qwertyfinger.musicreleasetracker.Constants;
 import com.qwertyfinger.musicreleasetracker.R;
 import com.qwertyfinger.musicreleasetracker.adapters.MyFragmentPagerAdapter;
 import com.qwertyfinger.musicreleasetracker.jobs.RefreshReleasesJob;
-import com.qwertyfinger.musicreleasetracker.util.Utils;
+import com.qwertyfinger.musicreleasetracker.misc.Utils;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;

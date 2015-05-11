@@ -15,12 +15,12 @@ import com.path.android.jobqueue.JobManager;
 import com.qwertyfinger.musicreleasetracker.App;
 import com.qwertyfinger.musicreleasetracker.R;
 import com.qwertyfinger.musicreleasetracker.adapters.ArtistsListAdapter;
+import com.qwertyfinger.musicreleasetracker.entities.Artist;
 import com.qwertyfinger.musicreleasetracker.events.ArtistDeletedEvent;
 import com.qwertyfinger.musicreleasetracker.events.ArtistsFetchedEvent;
 import com.qwertyfinger.musicreleasetracker.events.NoArtistsEvent;
 import com.qwertyfinger.musicreleasetracker.jobs.EmptyArtistsJob;
 import com.qwertyfinger.musicreleasetracker.jobs.FetchArtistsJob;
-import com.qwertyfinger.musicreleasetracker.misc.Artist;
 import com.qwertyfinger.musicreleasetracker.misc.ListScrollListener;
 
 import java.util.ArrayList;

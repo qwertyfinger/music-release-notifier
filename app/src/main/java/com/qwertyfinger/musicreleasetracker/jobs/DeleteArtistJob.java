@@ -8,12 +8,12 @@ import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasetracker.Constants;
 import com.qwertyfinger.musicreleasetracker.database.DatabaseHandler;
+import com.qwertyfinger.musicreleasetracker.entities.Artist;
+import com.qwertyfinger.musicreleasetracker.entities.Release;
 import com.qwertyfinger.musicreleasetracker.events.ArtistDeletedEvent;
 import com.qwertyfinger.musicreleasetracker.events.NoArtistsEvent;
 import com.qwertyfinger.musicreleasetracker.events.ReleasesChangedEvent;
-import com.qwertyfinger.musicreleasetracker.misc.Artist;
-import com.qwertyfinger.musicreleasetracker.misc.Release;
-import com.qwertyfinger.musicreleasetracker.util.Utils;
+import com.qwertyfinger.musicreleasetracker.misc.Utils;
 
 import java.io.File;
 import java.util.List;

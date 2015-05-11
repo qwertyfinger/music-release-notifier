@@ -10,8 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.qwertyfinger.musicreleasetracker.R;
-import com.qwertyfinger.musicreleasetracker.misc.Release;
-import com.qwertyfinger.musicreleasetracker.util.Utils;
+import com.qwertyfinger.musicreleasetracker.entities.Release;
+import com.qwertyfinger.musicreleasetracker.misc.Utils;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 

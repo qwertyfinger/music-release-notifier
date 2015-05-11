@@ -1,4 +1,4 @@
-package com.qwertyfinger.musicreleasetracker.util;
+package com.qwertyfinger.musicreleasetracker.misc;
 
 import android.content.Context;
 import android.os.Environment;

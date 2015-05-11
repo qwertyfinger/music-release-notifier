@@ -35,7 +35,7 @@ public class SearchArtistJob extends Job {
         Caller.getInstance().setUserAgent(Constants.LASTFM_USER_AGENT);
         Caller.getInstance().setCache(null);
 
-        List<com.qwertyfinger.musicreleasetracker.misc.Artist> finalArtists = new ArrayList<>();
+        List<com.qwertyfinger.musicreleasetracker.entities.Artist> finalArtists = new ArrayList<>();
         List<Artist> artists = (ArrayList<Artist>) Artist.search(query, Constants.LASTFM_API_KEY);
 
         for (Artist artist: artists){
@@ -46,7 +46,7 @@ public class SearchArtistJob extends Job {
                 if (artist.getName().equalsIgnoreCase("placebo"))
                     id = "847e8284-8582-4b0e-9c26-b042a4f49e57";
                 String imageUrl = artist.getImageURL(ImageSize.EXTRALARGE);
-                finalArtists.add(new com.qwertyfinger.musicreleasetracker.misc.Artist(id, artist.getName(), imageUrl));
+                finalArtists.add(new com.qwertyfinger.musicreleasetracker.entities.Artist(id, artist.getName(), imageUrl));
             }
         }
         EventBus.getDefault().post(new SearchQueryEvent(finalArtists));

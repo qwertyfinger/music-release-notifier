@@ -29,6 +29,7 @@ import com.qwertyfinger.musicreleasetracker.R;
 import com.qwertyfinger.musicreleasetracker.adapters.SearchResultsAdapter;
 import com.qwertyfinger.musicreleasetracker.contentProviders.MySuggestionProvider;
 import com.qwertyfinger.musicreleasetracker.database.DatabaseHandler;
+import com.qwertyfinger.musicreleasetracker.entities.Artist;
 import com.qwertyfinger.musicreleasetracker.events.ArtistAddedEvent;
 import com.qwertyfinger.musicreleasetracker.events.ArtistDeletedEvent;
 import com.qwertyfinger.musicreleasetracker.events.ArtistExistsEvent;
@@ -38,9 +39,8 @@ import com.qwertyfinger.musicreleasetracker.events.SearchingEvent;
 import com.qwertyfinger.musicreleasetracker.jobs.FetchArtistsJob;
 import com.qwertyfinger.musicreleasetracker.jobs.RefreshReleasesJob;
 import com.qwertyfinger.musicreleasetracker.jobs.SearchArtistJob;
-import com.qwertyfinger.musicreleasetracker.misc.Artist;
 import com.qwertyfinger.musicreleasetracker.misc.ListScrollListener;
-import com.qwertyfinger.musicreleasetracker.util.Utils;
+import com.qwertyfinger.musicreleasetracker.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;

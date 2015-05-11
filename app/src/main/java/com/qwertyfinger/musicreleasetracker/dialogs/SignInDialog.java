@@ -12,7 +12,7 @@ import android.widget.EditText;
 
 import com.qwertyfinger.musicreleasetracker.R;
 import com.qwertyfinger.musicreleasetracker.fragments.SettingsFragment;
-import com.qwertyfinger.musicreleasetracker.util.Utils;
+import com.qwertyfinger.musicreleasetracker.misc.Utils;
 
 public class SignInDialog extends DialogPreference {
 

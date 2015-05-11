@@ -6,10 +6,10 @@ import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasetracker.Constants;
 import com.qwertyfinger.musicreleasetracker.database.DatabaseHandler;
+import com.qwertyfinger.musicreleasetracker.entities.Release;
 import com.qwertyfinger.musicreleasetracker.events.NoArtistsEvent;
 import com.qwertyfinger.musicreleasetracker.events.NoReleasesEvent;
 import com.qwertyfinger.musicreleasetracker.events.ReleasesFetchedEvent;
-import com.qwertyfinger.musicreleasetracker.misc.Release;
 
 import java.util.List;
 

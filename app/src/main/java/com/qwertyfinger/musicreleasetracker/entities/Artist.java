@@ -1,4 +1,4 @@
-package com.qwertyfinger.musicreleasetracker.misc;
+package com.qwertyfinger.musicreleasetracker.entities;
 
 public class Artist {
     private String title;
