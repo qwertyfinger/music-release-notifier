@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:mrt="http://schemas.android.com/apk/res/com.qwertyfinger.musicreleasetracker">
+
+    <CheckBoxPreference
+        android:key="wifi_only"
+        android:title="@string/sync_wifi"
+        android:summary="@string/sync_wifi_sum"
+        android:defaultValue="true" />
+
+    <ListPreference
+        android:key="sync_frequency"
+        android:title="@string/sync_frequency"
+        android:dialogTitle="@string/sync_frequency"
+        android:entries="@array/sync_frequency_entries"
+        android:entryValues="@array/sync_frequency_values"
+        android:defaultValue="5" />
+
+    <!-- For future implementation-->
+   <!-- <MultiSelectListPreference
+        android:key="subscriptions"
+        android:title="@string/subscriptions"
+        android:dialogTitle="@string/subscriptions"
+        android:entries="@array/subscriptions_entries"
+        android:entryValues="@array/subscriptions_values"
+        android:defaultValue="@array/subscriptions_default_value" />-->
+
+    <MultiSelectListPreference
+        android:key="notifications"
+        android:title="@string/notifications"
+        android:dialogTitle="@string/notifications"
+        android:entries="@array/notifications_entries"
+        android:entryValues="@array/notifications_values"
+        android:defaultValue="@array/notifications_default_value" />
+
+    <com.qwertyfinger.musicreleasetracker.dialogs.SignInDialog
+        android:key="lastfm"
+        android:title="@string/lastfm"
+        android:dialogTitle="@string/lastfm_dialog"
+        android:dialogLayout="@layout/signin_dialog"
+        mrt:signInService="lastfm"/>
+
+    <com.qwertyfinger.musicreleasetracker.dialogs.SignInDialog
+        android:key="deezer"
+        android:title="@string/deezer"
+        android:dialogTitle="@string/deezer_dialog"
+        android:dialogLayout="@layout/signin_dialog"
+        mrt:signInService="deezer"/>
+
+</PreferenceScreen>

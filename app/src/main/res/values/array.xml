@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="sync_frequency_entries">
+        <item>Never</item>
+        <item>Weekly</item>
+        <item>Every 5 days</item>
+        <item>Every 3 days</item>
+        <item>Daily</item>
+    </string-array>
+
+    <string-array name="sync_frequency_values">
+        <item>0</item>
+        <item>7</item>
+        <item>5</item>
+        <item>3</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="subscriptions_entries">
+        <item>Album</item>
+        <item>Single</item>
+        <item>EP</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="subscriptions_values">
+        <item>Album</item>
+        <item>Single</item>
+        <item>EP</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="subscriptions_default_value">
+        <item>Album</item>
+    </string-array>
+
+    <string-array name="notifications_entries">
+        <item>Two weeks prior</item>
+        <item>Week prior</item>
+        <item>3 days prior</item>
+        <item>1 day prior</item>
+        <item>On release day</item>
+    </string-array>
+
+    <string-array name="notifications_values">
+        <item>14</item>
+        <item>7</item>
+        <item>3</item>
+        <item>1</item>
+        <item>0</item>
+    </string-array>
+
+    <string-array name="notifications_default_value">
+        <item>0</item>
+    </string-array>
+
+</resources>
