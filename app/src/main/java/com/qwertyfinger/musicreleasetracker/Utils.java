@@ -121,64 +121,64 @@ public class Utils {
      * @param month number of month, as specified by Java Calendar
      * @return correct name of month for header
      */
-    public static String convertMonth(boolean ukOrRu, int month) {
+    public static String convertMonth(Context context, boolean ukOrRu, int month) {
         if (ukOrRu) {
             switch (month) {
                 case 0:
-                    return "Січень";
+                    return context.getString(R.string.january_uk);
                 case 1:
-                    return "Лютий";
+                    return context.getString(R.string.february_uk);
                 case 2:
-                    return "Березень";
+                    return context.getString(R.string.march_uk);
                 case 3:
-                    return "Квітень";
+                    return context.getString(R.string.april_uk);
                 case 4:
-                    return "Травень";
+                    return context.getString(R.string.may_uk);
                 case 5:
-                    return "Червень";
+                    return context.getString(R.string.june_uk);
                 case 6:
-                    return "Липень";
+                    return context.getString(R.string.july_uk);
                 case 7:
-                    return "Серпень";
+                    return context.getString(R.string.august_uk);
                 case 8:
-                    return "Вересень";
+                    return context.getString(R.string.september_uk);
                 case 9:
-                    return "Жовтень";
+                    return context.getString(R.string.october_uk);
                 case 10:
-                    return "Листопад";
+                    return context.getString(R.string.november_uk);
                 case 11:
-                    return "Грудень";
+                    return context.getString(R.string.december_uk);
                 default:
-                    return "Не визначено";
+                    return context.getString(R.string.tba_uk);
             }
         } else {
             switch (month) {
                 case 0:
-                    return "Январь";
+                    return context.getString(R.string.january_ru);
                 case 1:
-                    return "Февраль";
+                    return context.getString(R.string.february_ru);
                 case 2:
-                    return "Март";
+                    return context.getString(R.string.march_ru);
                 case 3:
-                    return "Апрель";
+                    return context.getString(R.string.april_ru);
                 case 4:
-                    return "Май";
+                    return context.getString(R.string.may_ru);
                 case 5:
-                    return "Июнь";
+                    return context.getString(R.string.june_ru);
                 case 6:
-                    return "Июль";
+                    return context.getString(R.string.july_ru);
                 case 7:
-                    return "Август";
+                    return context.getString(R.string.august_ru);
                 case 8:
-                    return "Сентябрь";
+                    return context.getString(R.string.september_ru);
                 case 9:
-                    return "Октябрь";
+                    return context.getString(R.string.october_ru);
                 case 10:
-                    return "Ноябрь";
+                    return context.getString(R.string.november_ru);
                 case 11:
-                    return "Декабрь";
+                    return context.getString(R.string.december_ru);
                 default:
-                    return "Не определено";
+                    return context.getString(R.string.tba_ru);
             }
         }
     }

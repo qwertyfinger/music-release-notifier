@@ -117,10 +117,10 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
         String headerText = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, context.getResources().getConfiguration().locale);
 
         if (Locale.getDefault().getLanguage().equals("uk"))
-            headerText = Utils.convertMonth(true, calendar.get(Calendar.MONTH));
+            headerText = Utils.convertMonth(context, true, calendar.get(Calendar.MONTH));
 
         if (Locale.getDefault().getLanguage().equals("ru"))
-            headerText = Utils.convertMonth(false, calendar.get(Calendar.MONTH));
+            headerText = Utils.convertMonth(context, false, calendar.get(Calendar.MONTH));
 
         holder.header.setText(headerText);
 
