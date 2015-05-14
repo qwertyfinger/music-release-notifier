@@ -13,9 +13,9 @@ import android.widget.TextView;
 import com.path.android.jobqueue.JobManager;
 import com.qwertyfinger.musicreleasetracker.App;
 import com.qwertyfinger.musicreleasetracker.R;
+import com.qwertyfinger.musicreleasetracker.Utils;
 import com.qwertyfinger.musicreleasetracker.entities.Artist;
-import com.qwertyfinger.musicreleasetracker.jobs.DeleteArtistJob;
-import com.qwertyfinger.musicreleasetracker.misc.Utils;
+import com.qwertyfinger.musicreleasetracker.jobs.artist.DeleteArtistJob;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
@@ -112,7 +112,7 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
             holder = (HeaderViewHolder) convertView.getTag();
         }
 
-        String headerText = "" + artists.get(position).getTitle().subSequence(0, 1).charAt(0);
+        String headerText = "" + artists.get(position).getTitle().toUpperCase().subSequence(0, 1).charAt(0);
         holder.header.setText(headerText);
 
         return convertView;
@@ -120,7 +120,7 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
 
     @Override
     public long getHeaderId(int position) {
-        return artists.get(position).getTitle().subSequence(0, 1).charAt(0);
+        return artists.get(position).getTitle().toLowerCase().subSequence(0, 1).charAt(0);
     }
 
     @Override

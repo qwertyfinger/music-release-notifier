@@ -2,11 +2,14 @@ package com.qwertyfinger.musicreleasetracker;
 
 public class Constants {
     public static final String ***REMOVED*** = "***REMOVED***";
-    public static final String ***REMOVED*** = "***REMOVED***";
+    public static final String DEEZER_APP_ID = "***REMOVED***";
 
     public static final int EXPLICIT_REFRESH = 0;
     public static final int AFTER_ADDING_REFRESH = 1;
     public static final int SCHEDULED_REFRESH = 2;
+
+    public static final int ARTIST_USER_ADD = 0;
+    public static final int ARTIST_SYNC_ADD = 1;
 
     public static final int JOB_PRIORITY_LOW = 1;
     public static final int JOB_PRIORITY_MEDIUM = 2;

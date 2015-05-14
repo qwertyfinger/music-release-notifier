@@ -3,13 +3,30 @@ package com.qwertyfinger.musicreleasetracker;
 import android.app.Application;
 import android.util.Log;
 
+import com.deezer.sdk.network.connect.DeezerConnect;
+import com.deezer.sdk.network.connect.SessionStore;
 import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.config.Configuration;
 import com.path.android.jobqueue.log.CustomLogger;
+import com.qwertyfinger.musicreleasetracker.database.DatabaseHandler;
+import com.qwertyfinger.musicreleasetracker.entities.Artist;
+import com.qwertyfinger.musicreleasetracker.events.deezer.DeezerRequestFinEvent;
+import com.qwertyfinger.musicreleasetracker.events.release.ReleasesChangedEvent;
+import com.qwertyfinger.musicreleasetracker.events.release.ReleasesLoadedEvent;
+import com.qwertyfinger.musicreleasetracker.jobs.artist.AddArtistsJob;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import de.greenrobot.event.EventBus;
+import de.umass.lastfm.Caller;
+import de.umass.lastfm.ImageSize;
 
 public class App  extends Application{
     private static App instance;
     private JobManager jobManager;
+    private DeezerConnect deezerConnect;
+    public static boolean firstLoad = true;
 
     public App(){
         instance = this;
@@ -23,10 +40,22 @@ public class App  extends Application{
         return jobManager;
     }
 
+    public DeezerConnect getDeezerConnect() {
+        return deezerConnect;
+    }
+
     @Override
     public void onCreate(){
         super.onCreate();
         configureJobManager();
+        configureDeezerConnect();
+        EventBus.getDefault().register(this);
+    }
+
+    private void configureDeezerConnect() {
+        deezerConnect = new DeezerConnect(Constants.DEEZER_APP_ID);
+        SessionStore sessionStore = new SessionStore();
+        sessionStore.restore(deezerConnect, getApplicationContext());
     }
 
     private void configureJobManager() {
@@ -56,4 +85,37 @@ public class App  extends Application{
         jobManager = new JobManager(this, config);
     }
 
+    public void onEventBackgroundThread(ReleasesLoadedEvent event) {
+        if (event.getReleases() != null) {
+            if (!event.getReleases().isEmpty()) {
+                DatabaseHandler.getInstance(getApplicationContext()).addReleases(event.getReleases());
+                EventBus.getDefault().post(new ReleasesChangedEvent());
+            }
+        }
+    }
+
+    public void onEventAsync(DeezerRequestFinEvent event) {
+        List<Artist> outputArtists = new ArrayList<>();
+
+        Caller.getInstance().setUserAgent(Constants.LASTFM_USER_AGENT);
+        Caller.getInstance().setCache(null);
+
+        for (com.deezer.sdk.model.Artist deezerArtist: event.getArtists()) {
+            List<de.umass.lastfm.Artist> lastfmArtists = (ArrayList<de.umass.lastfm.Artist>)
+                    de.umass.lastfm.Artist.search(deezerArtist.getName(), Constants.LASTFM_API_KEY);
+
+            for (de.umass.lastfm.Artist lastfmArtist: lastfmArtists){
+                if (!lastfmArtist.getName().equalsIgnoreCase(deezerArtist.getName()) || lastfmArtist.getMbid().equals(""))
+                    continue;
+
+                String id = Utils.correctArtistMbid(lastfmArtist.getName());
+                if (id == null)
+                    id = lastfmArtist.getMbid();
+                outputArtists.add(new com.qwertyfinger.musicreleasetracker.entities.Artist(id, lastfmArtist.getName(),
+                        lastfmArtist.getImageURL(ImageSize.EXTRALARGE)));
+            }
+        }
+
+        jobManager.addJobInBackground(new AddArtistsJob(App.getInstance().getApplicationContext(), outputArtists));
+    }
 }

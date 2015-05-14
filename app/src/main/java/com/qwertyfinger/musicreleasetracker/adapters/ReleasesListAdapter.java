@@ -10,8 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.qwertyfinger.musicreleasetracker.R;
+import com.qwertyfinger.musicreleasetracker.Utils;
 import com.qwertyfinger.musicreleasetracker.entities.Release;
-import com.qwertyfinger.musicreleasetracker.misc.Utils;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
@@ -117,10 +117,10 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
         String headerText = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, context.getResources().getConfiguration().locale);
 
         if (Locale.getDefault().getLanguage().equals("uk"))
-            headerText = Utils.convertMonth(context, true, calendar.get(Calendar.MONTH));
+            headerText = Utils.convertMonth(true, calendar.get(Calendar.MONTH));
 
         if (Locale.getDefault().getLanguage().equals("ru"))
-            headerText = Utils.convertMonth(context, false, calendar.get(Calendar.MONTH));
+            headerText = Utils.convertMonth(false, calendar.get(Calendar.MONTH));
 
         holder.header.setText(headerText);
 

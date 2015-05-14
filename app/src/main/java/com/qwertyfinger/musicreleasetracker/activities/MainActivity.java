@@ -16,12 +16,9 @@ import com.path.android.jobqueue.JobManager;
 import com.qwertyfinger.musicreleasetracker.App;
 import com.qwertyfinger.musicreleasetracker.Constants;
 import com.qwertyfinger.musicreleasetracker.R;
-import com.qwertyfinger.musicreleasetracker.adapters.MyFragmentPagerAdapter;
-import com.qwertyfinger.musicreleasetracker.jobs.RefreshReleasesJob;
-import com.qwertyfinger.musicreleasetracker.misc.Utils;
-
-import java.io.File;
-import java.security.NoSuchAlgorithmException;
+import com.qwertyfinger.musicreleasetracker.Utils;
+import com.qwertyfinger.musicreleasetracker.adapters.MainFragmentPagerAdapter;
+import com.qwertyfinger.musicreleasetracker.jobs.release.RefreshReleasesJob;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -32,27 +29,29 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        File file = new File(getFilesDir(), "spaceOdyssey");
+        if (App.firstLoad) {
+            if (!Utils.isExternalStorageWritable()) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.storage_warning_title);
+                builder.setMessage(R.string.storage_warning_message);
+                builder.setNeutralButton(R.string.storage_warning_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builder.show();
+            }
+        }
+//       encryption key generation, unused for now
+        /*File file = new File(getFilesDir(), "spaceOdyssey");
         if (!file.exists()) {
             try {
                 Utils.generateKey(this);
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
-        }
-
-        if (!Utils.isExternalStorageWritable()) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.storage_warning_title);
-            builder.setMessage(R.string.storage_warning_message);
-            builder.setNeutralButton(R.string.storage_warning_button, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            builder.show();
-        }
+        }*/
 
         setContentView(R.layout.activity_main);
 
@@ -61,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         jobManager = App.getInstance().getJobManager();
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setAdapter(new MyFragmentPagerAdapter(getSupportFragmentManager()));
+        viewPager.setAdapter(new MainFragmentPagerAdapter(getSupportFragmentManager()));
 
         PagerSlidingTabStrip tabsStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
         tabsStrip.setViewPager(viewPager);
@@ -73,6 +72,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        App.firstLoad = true;
     }
 
     @Override
@@ -90,21 +95,6 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    protected void onStop(){
-        super.onStop();
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-    }
-
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
     }
 
 }

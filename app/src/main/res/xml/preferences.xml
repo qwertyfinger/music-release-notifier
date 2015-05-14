@@ -33,18 +33,18 @@
         android:entryValues="@array/notifications_values"
         android:defaultValue="@array/notifications_default_value" />
 
-    <com.qwertyfinger.musicreleasetracker.dialogs.SignInDialog
-        android:key="lastfm"
+    <com.qwertyfinger.musicreleasetracker.dialogs.LastfmSignInDialog
+        android:key="last_fm"
         android:title="@string/lastfm"
         android:dialogTitle="@string/lastfm_dialog"
-        android:dialogLayout="@layout/signin_dialog"
-        mrt:signInService="lastfm"/>
+        android:dialogLayout="@layout/lastfm_dialog"
+        mrt:signInService="lastfm"
+        android:defaultValue=""/>
 
-    <com.qwertyfinger.musicreleasetracker.dialogs.SignInDialog
+    <com.qwertyfinger.musicreleasetracker.dialogs.DeezerSignInDialog
         android:key="deezer"
         android:title="@string/deezer"
-        android:dialogTitle="@string/deezer_dialog"
-        android:dialogLayout="@layout/signin_dialog"
-        mrt:signInService="deezer"/>
+        android:defaultValue="false"
+        android:dialogTitle="@string/deezer_dialog" />
 
 </PreferenceScreen>

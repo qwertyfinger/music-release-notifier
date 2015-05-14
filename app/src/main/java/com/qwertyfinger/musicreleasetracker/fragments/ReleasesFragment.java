@@ -15,11 +15,12 @@ import com.qwertyfinger.musicreleasetracker.R;
 import com.qwertyfinger.musicreleasetracker.adapters.ReleasesListAdapter;
 import com.qwertyfinger.musicreleasetracker.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasetracker.entities.Release;
-import com.qwertyfinger.musicreleasetracker.events.NoArtistsEvent;
-import com.qwertyfinger.musicreleasetracker.events.NoReleasesEvent;
-import com.qwertyfinger.musicreleasetracker.events.ReleasesChangedEvent;
-import com.qwertyfinger.musicreleasetracker.events.ReleasesFetchedEvent;
-import com.qwertyfinger.musicreleasetracker.jobs.FetchReleasesJob;
+import com.qwertyfinger.musicreleasetracker.events.artist.ArtistsChangedEvent;
+import com.qwertyfinger.musicreleasetracker.events.artist.NoArtistsEvent;
+import com.qwertyfinger.musicreleasetracker.events.release.NoReleasesEvent;
+import com.qwertyfinger.musicreleasetracker.events.release.ReleasesChangedEvent;
+import com.qwertyfinger.musicreleasetracker.events.release.ReleasesFetchedEvent;
+import com.qwertyfinger.musicreleasetracker.jobs.release.FetchReleasesJob;
 import com.qwertyfinger.musicreleasetracker.misc.ListScrollListener;
 
 import java.util.ArrayList;
@@ -93,7 +94,9 @@ public class ReleasesFragment extends Fragment {
         }
 
         else {
-            jobManager.addJobInBackground(new FetchReleasesJob(getActivity()));
+            if (App.firstLoad) {
+                jobManager.addJobInBackground(new FetchReleasesJob(getActivity()));
+            }
 
             mNoArtists = (TextView) view.findViewById(R.id.noArtistsInRel);
             mNoReleases = (TextView) view.findViewById(R.id.noReleases);
@@ -115,6 +118,13 @@ public class ReleasesFragment extends Fragment {
         super.onDestroy();
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mStickyList != null)
+            state = mStickyList.onSaveInstanceState();
     }
 
     @Override
@@ -157,6 +167,12 @@ public class ReleasesFragment extends Fragment {
             savedInstanceState.putInt("fetchedListSize", -1);
 
         super.onSaveInstanceState(savedInstanceState);
+    }
+
+    public void onEventMainThread(ArtistsChangedEvent event) {
+        mNoArtists.setVisibility(View.GONE);
+        if (DatabaseHandler.getInstance(getActivity()).getReleasesCount() == 0)
+            mNoReleases.setVisibility(View.VISIBLE);
     }
 
     public void onEventMainThread(ReleasesFetchedEvent event) {

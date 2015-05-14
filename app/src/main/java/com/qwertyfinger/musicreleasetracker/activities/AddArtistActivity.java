@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
@@ -26,21 +25,21 @@ import com.path.android.jobqueue.JobManager;
 import com.qwertyfinger.musicreleasetracker.App;
 import com.qwertyfinger.musicreleasetracker.Constants;
 import com.qwertyfinger.musicreleasetracker.R;
+import com.qwertyfinger.musicreleasetracker.Utils;
 import com.qwertyfinger.musicreleasetracker.adapters.SearchResultsAdapter;
-import com.qwertyfinger.musicreleasetracker.contentProviders.MySuggestionProvider;
 import com.qwertyfinger.musicreleasetracker.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasetracker.entities.Artist;
-import com.qwertyfinger.musicreleasetracker.events.ArtistAddedEvent;
-import com.qwertyfinger.musicreleasetracker.events.ArtistDeletedEvent;
-import com.qwertyfinger.musicreleasetracker.events.ArtistExistsEvent;
 import com.qwertyfinger.musicreleasetracker.events.ReleaseAdapterEvent;
-import com.qwertyfinger.musicreleasetracker.events.SearchQueryEvent;
-import com.qwertyfinger.musicreleasetracker.events.SearchingEvent;
-import com.qwertyfinger.musicreleasetracker.jobs.FetchArtistsJob;
-import com.qwertyfinger.musicreleasetracker.jobs.RefreshReleasesJob;
-import com.qwertyfinger.musicreleasetracker.jobs.SearchArtistJob;
+import com.qwertyfinger.musicreleasetracker.events.artist.ArtistAddedEvent;
+import com.qwertyfinger.musicreleasetracker.events.artist.ArtistDeletedEvent;
+import com.qwertyfinger.musicreleasetracker.events.artist.ArtistExistsEvent;
+import com.qwertyfinger.musicreleasetracker.events.artist.ArtistsChangedEvent;
+import com.qwertyfinger.musicreleasetracker.events.search.SearchQueryEvent;
+import com.qwertyfinger.musicreleasetracker.events.search.SearchingEvent;
+import com.qwertyfinger.musicreleasetracker.jobs.artist.FetchArtistsJob;
+import com.qwertyfinger.musicreleasetracker.jobs.artist.SearchArtistJob;
+import com.qwertyfinger.musicreleasetracker.jobs.release.RefreshReleasesJob;
 import com.qwertyfinger.musicreleasetracker.misc.ListScrollListener;
-import com.qwertyfinger.musicreleasetracker.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +58,7 @@ public class AddArtistActivity extends AppCompatActivity{
     private Parcelable state;
     private List<Artist> searchResults;
     private CharSequence searchQuery = "";
+    private boolean searchFocus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +89,7 @@ public class AddArtistActivity extends AppCompatActivity{
             listView.setOnScrollListener(new ListScrollListener(this));
 
             searchQuery = savedInstanceState.getCharSequence("searchQuery");
+            searchFocus = savedInstanceState.getBoolean("searchFocus");
 
             int addedListSize = savedInstanceState.getInt("addedListSize");
             if (addedListSize != -1) {
@@ -126,6 +127,8 @@ public class AddArtistActivity extends AppCompatActivity{
         }
 
         else {
+            searchFocus = true;
+
             empty = (TextView) findViewById(R.id.empty);
 
             spinner = (ProgressBar)findViewById(R.id.progressBar);
@@ -158,9 +161,6 @@ public class AddArtistActivity extends AppCompatActivity{
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-
-            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this, MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
-            suggestions.saveRecentQuery(query, null);
 
             jobManager.addJobInBackground(new SearchArtistJob(query));
         }
@@ -206,6 +206,7 @@ public class AddArtistActivity extends AppCompatActivity{
                 if (addedArtists != null) {
                     if (!addedArtists.isEmpty()) {
                         jobManager.addJobInBackground(new FetchArtistsJob(activity));
+                        EventBus.getDefault().post(new ArtistsChangedEvent());
                         jobManager.addJobInBackground(new RefreshReleasesJob(activity, Constants.AFTER_ADDING_REFRESH, addedArtists));
                     }
                 }
@@ -215,7 +216,8 @@ public class AddArtistActivity extends AppCompatActivity{
 
         MenuItemCompat.expandActionView(search);
         searchView.setQuery(searchQuery, false);
-        searchView.clearFocus();
+        if (!searchFocus)
+            searchView.clearFocus();
         return true;
     }
 
@@ -256,8 +258,10 @@ public class AddArtistActivity extends AppCompatActivity{
         if (noResult != null)
             savedInstanceState.putInt("noResultVisibility", noResult.getVisibility());
 
-        if (searchView != null)
+        if (searchView != null) {
             savedInstanceState.putCharSequence("searchQuery", searchView.getQuery());
+            savedInstanceState.putBoolean("searchFocus", searchView.hasFocus());
+        }
         else
             savedInstanceState.putCharSequence("searchQuery", "");
 
@@ -310,7 +314,7 @@ public class AddArtistActivity extends AppCompatActivity{
 
     public void onEventMainThread(SearchingEvent event){
         empty.setVisibility(View.GONE);
-
+        noResult.setVisibility(View.GONE);
         spinner.setVisibility(View.VISIBLE);
     }
 

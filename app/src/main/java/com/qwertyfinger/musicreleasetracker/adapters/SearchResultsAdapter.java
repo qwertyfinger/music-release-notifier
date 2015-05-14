@@ -2,6 +2,7 @@ package com.qwertyfinger.musicreleasetracker.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,20 +14,21 @@ import android.widget.TextView;
 import com.path.android.jobqueue.JobManager;
 import com.qwertyfinger.musicreleasetracker.App;
 import com.qwertyfinger.musicreleasetracker.R;
+import com.qwertyfinger.musicreleasetracker.Utils;
 import com.qwertyfinger.musicreleasetracker.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasetracker.entities.Artist;
-import com.qwertyfinger.musicreleasetracker.events.ArtistAddedEvent;
-import com.qwertyfinger.musicreleasetracker.events.ArtistDeletedEvent;
-import com.qwertyfinger.musicreleasetracker.events.ArtistImageLoadedEvent;
 import com.qwertyfinger.musicreleasetracker.events.ReleaseAdapterEvent;
-import com.qwertyfinger.musicreleasetracker.jobs.AddArtistJob;
-import com.qwertyfinger.musicreleasetracker.jobs.DeleteArtistJob;
-import com.qwertyfinger.musicreleasetracker.misc.Utils;
+import com.qwertyfinger.musicreleasetracker.events.artist.ArtistAddedEvent;
+import com.qwertyfinger.musicreleasetracker.events.artist.ArtistDeletedEvent;
+import com.qwertyfinger.musicreleasetracker.events.artist.ArtistImageLoadedEvent;
+import com.qwertyfinger.musicreleasetracker.jobs.artist.AddArtistsJob;
+import com.qwertyfinger.musicreleasetracker.jobs.artist.DeleteArtistJob;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -85,7 +87,7 @@ public class SearchResultsAdapter extends ArrayAdapter<Artist> {
             holder.removeButton.setVisibility(View.VISIBLE);
 
             if (Utils.isExternalStorageReadable()) {
-                File thumbnail = context.getFileStreamPath(artist.getId() + ".jpg");
+                File thumbnail = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), artist.getId() + ".jpg");
 
                 Picasso.with(context)
                         .load(thumbnail)
@@ -169,14 +171,16 @@ public class SearchResultsAdapter extends ArrayAdapter<Artist> {
         holder.removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                jobManager.addJobInBackground(new DeleteArtistJob(context, artist, view));
+                jobManager.addJobInBackground(new DeleteArtistJob(context, new Artist(artist.getId(), artist.getTitle(), artist.getId() + ".jpg"), view));
             }
         });
 
         holder.addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                jobManager.addJobInBackground(new AddArtistJob(context, artist, view));
+                List<Artist> artists = new ArrayList<>();
+                artists.add(artist);
+                jobManager.addJobInBackground(new AddArtistsJob(context, artists, view));
             }
         });
 
@@ -224,7 +228,7 @@ public class SearchResultsAdapter extends ArrayAdapter<Artist> {
         }
     }
 
-    public void onEventMainThread(ReleaseAdapterEvent event) {
+    public void onEvent(ReleaseAdapterEvent event) {
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this);
     }

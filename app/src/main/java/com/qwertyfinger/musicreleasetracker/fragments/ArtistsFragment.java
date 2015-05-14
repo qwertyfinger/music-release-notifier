@@ -16,11 +16,12 @@ import com.qwertyfinger.musicreleasetracker.App;
 import com.qwertyfinger.musicreleasetracker.R;
 import com.qwertyfinger.musicreleasetracker.adapters.ArtistsListAdapter;
 import com.qwertyfinger.musicreleasetracker.entities.Artist;
-import com.qwertyfinger.musicreleasetracker.events.ArtistDeletedEvent;
-import com.qwertyfinger.musicreleasetracker.events.ArtistsFetchedEvent;
-import com.qwertyfinger.musicreleasetracker.events.NoArtistsEvent;
-import com.qwertyfinger.musicreleasetracker.jobs.EmptyArtistsJob;
-import com.qwertyfinger.musicreleasetracker.jobs.FetchArtistsJob;
+import com.qwertyfinger.musicreleasetracker.events.artist.ArtistDeletedEvent;
+import com.qwertyfinger.musicreleasetracker.events.artist.ArtistsChangedEvent;
+import com.qwertyfinger.musicreleasetracker.events.artist.ArtistsFetchedEvent;
+import com.qwertyfinger.musicreleasetracker.events.artist.NoArtistsEvent;
+import com.qwertyfinger.musicreleasetracker.jobs.artist.EmptyArtistsJob;
+import com.qwertyfinger.musicreleasetracker.jobs.artist.FetchArtistsJob;
 import com.qwertyfinger.musicreleasetracker.misc.ListScrollListener;
 
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class ArtistsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         if (view == null)
-            view = inflater.inflate(R.layout.fragment_artists, container, false);
+             view = inflater.inflate(R.layout.fragment_artists, container, false);
 
         if (savedInstanceState != null){
 
@@ -84,7 +85,10 @@ public class ArtistsFragment extends Fragment {
         }
 
         else {
-            jobManager.addJobInBackground(new FetchArtistsJob(getActivity()));
+            if (App.firstLoad) {
+                jobManager.addJobInBackground(new FetchArtistsJob(getActivity()));
+                App.firstLoad = false;
+            }
 
             mNoArtists = (TextView) view.findViewById(R.id.noArtists);
 
@@ -123,9 +127,14 @@ public class ArtistsFragment extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
+    public void onStop() {
+        super.onStop();
         if (mStickyList != null)
             state = mStickyList.onSaveInstanceState();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
 
         if (mNoArtists != null)
             savedInstanceState.putInt("noArtistVisibility", mNoArtists.getVisibility());
@@ -153,6 +162,10 @@ public class ArtistsFragment extends Fragment {
             savedInstanceState.putInt("fetchedListSize", -1);
 
         super.onSaveInstanceState(savedInstanceState);
+    }
+
+    public void onEvent(ArtistsChangedEvent event) {
+        jobManager.addJobInBackground(new FetchArtistsJob(getActivity()));
     }
 
     public void onEventMainThread(ArtistsFetchedEvent event){
