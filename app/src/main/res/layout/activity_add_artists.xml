@@ -8,7 +8,12 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/searchList"/>
+        android:id="@+id/searchList"
+        android:clipToPadding="false"
+        android:scrollbarStyle="outsideOverlay"
+        android:smoothScrollbar="true"
+        android:scrollingCache="false"
+        android:animationCache="false"/>
 
     <TextView android:id="@+id/noResult"
         android:layout_width="match_parent"

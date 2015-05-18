@@ -19,8 +19,26 @@
         android:orderInCategory="3"
         app:showAsAction="always" />
 
+    <item android:id="@+id/action_empty_artists"
+          android:title="@string/action_empty_artists"
+          android:orderInCategory="4"
+          app:showAsAction="never"
+          android:visible="false"/>
+
+    <item android:id="@+id/action_lastfm_sync"
+          android:title="@string/sync_with_lastfm"
+          android:orderInCategory="5"
+          app:showAsAction="never"
+          android:visible="false"/>
+
+    <item android:id="@+id/action_deezer_sync"
+          android:title="@string/sync_with_deezer"
+          android:orderInCategory="6"
+          app:showAsAction="never"
+          android:visible="false"/>
+
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
-        android:orderInCategory="5"
+        android:orderInCategory="999"
         app:showAsAction="never" />
 </menu>

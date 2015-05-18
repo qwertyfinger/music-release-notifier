@@ -78,7 +78,7 @@ public class LastfmSignInDialog extends DialogPreference {
 
         builder.setNegativeButton(R.string.cancel_button, cancelListener);
         builder.setMessage(R.string.lastfm_dialog_message);
-        builder.setPositiveButton(R.string.log_in_button, okListener);
+        builder.setPositiveButton(R.string.ok_button, okListener);
     }
 
     @Override
@@ -121,11 +121,15 @@ public class LastfmSignInDialog extends DialogPreference {
             public void onRun() throws Throwable {
                 User user = User.getInfo(username.getText().toString(), Constants.LASTFM_API_KEY);
 
-                int thresholdInt = Integer.parseInt(threshold.getText().toString());
+                int thresholdInt;
+                if (threshold.getText().toString().equals(""))
+                    thresholdInt = 0;
+                else
+                    thresholdInt = Integer.parseInt(threshold.getText().toString());
 
                 Dialog dialog = getDialog();
                 Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");
-                if ((!(user == null)) && thresholdInt >= 0) {
+                if (user != null) {
                     SharedPreferences.Editor editor = getEditor();
                     editor.putString(SettingsFragment.LAST_FM, username.getText().toString());
                     editor.putInt(SettingsFragment.LAST_FM_THRESHOLD, thresholdInt);
@@ -159,11 +163,13 @@ public class LastfmSignInDialog extends DialogPreference {
         });
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(UsernameInvalidEvent event) {
         wrongData.setVisibility(View.VISIBLE);
         wrongData.setText(R.string.lastfm_wrong_username);
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(ThresholdInvalidEvent event) {
         wrongData.setVisibility(View.VISIBLE);
         wrongData.setText(R.string.lastfm_invalid_threshold);

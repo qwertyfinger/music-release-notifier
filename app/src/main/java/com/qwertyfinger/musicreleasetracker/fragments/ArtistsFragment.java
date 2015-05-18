@@ -1,12 +1,11 @@
 package com.qwertyfinger.musicreleasetracker.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -14,13 +13,14 @@ import android.widget.TextView;
 import com.path.android.jobqueue.JobManager;
 import com.qwertyfinger.musicreleasetracker.App;
 import com.qwertyfinger.musicreleasetracker.R;
+import com.qwertyfinger.musicreleasetracker.Utils;
 import com.qwertyfinger.musicreleasetracker.adapters.ArtistsListAdapter;
+import com.qwertyfinger.musicreleasetracker.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasetracker.entities.Artist;
 import com.qwertyfinger.musicreleasetracker.events.artist.ArtistDeletedEvent;
 import com.qwertyfinger.musicreleasetracker.events.artist.ArtistsChangedEvent;
 import com.qwertyfinger.musicreleasetracker.events.artist.ArtistsFetchedEvent;
 import com.qwertyfinger.musicreleasetracker.events.artist.NoArtistsEvent;
-import com.qwertyfinger.musicreleasetracker.jobs.artist.EmptyArtistsJob;
 import com.qwertyfinger.musicreleasetracker.jobs.artist.FetchArtistsJob;
 import com.qwertyfinger.musicreleasetracker.misc.ListScrollListener;
 
@@ -39,6 +39,7 @@ public class ArtistsFragment extends Fragment {
     private Parcelable state;
     private List<Artist> fetchedArtists;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,71 +54,53 @@ public class ArtistsFragment extends Fragment {
         if (view == null)
              view = inflater.inflate(R.layout.fragment_artists, container, false);
 
+        mNoArtists = (TextView) view.findViewById(R.id.noArtists);
+
+        mStickyList = (StickyListHeadersListView) view.findViewById(R.id.artistsList);
+        mStickyList.setOnScrollListener(new ListScrollListener(getActivity()));
+        mStickyList.setAreHeadersSticky(false);
+
         if (savedInstanceState != null){
 
-            mNoArtists = (TextView) view.findViewById(R.id.noArtists);
             if (savedInstanceState.getInt("noArtistVisibility") == View.VISIBLE)
                 mNoArtists.setVisibility(View.VISIBLE);
             else
                 mNoArtists.setVisibility(View.GONE);
 
-            mStickyList = (StickyListHeadersListView) view.findViewById(R.id.artistsList);
-            mStickyList.setOnScrollListener(new ListScrollListener(getActivity()));
-            mStickyList.setAreHeadersSticky(false);
-
-            int fetchListSize = savedInstanceState.getInt("fetchedListSize");
-            if (fetchListSize != -1) {
-                if (fetchListSize > 0) {
-                    List<String> ids = savedInstanceState.getStringArrayList("ids");
-                    List<String> titles = savedInstanceState.getStringArrayList("titles");
-                    List<String> images = savedInstanceState.getStringArrayList("images");
-
-                    if (fetchedArtists == null)
-                        fetchedArtists = new ArrayList<>();
-
-                    for (int i = 0; i < savedInstanceState.getInt("fetchedListSize"); i++) {
-                        fetchedArtists.add(i, new Artist(ids.get(i), titles.get(i), images.get(i)));
-                    }
-                    mAdapter = new ArtistsListAdapter(getActivity(), fetchedArtists);
-                    mStickyList.setAdapter(mAdapter);
-                }
+            fetchedArtists = savedInstanceState.getParcelableArrayList("fetchedList");
+            if (fetchedArtists == null)
+                fetchedArtists = new ArrayList<>();
+            if (fetchedArtists.size() > 0) {
+                mAdapter = new ArtistsListAdapter(getActivity(), fetchedArtists);
+                mStickyList.setAdapter(mAdapter);
             }
         }
 
         else {
-            if (App.firstLoad) {
-                jobManager.addJobInBackground(new FetchArtistsJob(getActivity()));
-                App.firstLoad = false;
+            fetchedArtists = new ArrayList<>();
+            if (!Utils.isExternalStorageWritable()) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(R.string.storage_warning_title);
+                builder.setMessage(R.string.storage_warning_message);
+                builder.setNeutralButton(R.string.storage_warning_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builder.show();
             }
-
-            mNoArtists = (TextView) view.findViewById(R.id.noArtists);
-
-            mStickyList = (StickyListHeadersListView) view.findViewById(R.id.artistsList);
-            mStickyList.setOnScrollListener(new ListScrollListener(getActivity()));
-            mStickyList.setAreHeadersSticky(false);
         }
 
         if (state != null)
             mStickyList.onRestoreInstanceState(state);
 
+        if (DatabaseHandler.getInstance(getActivity()).getArtistsCount() != fetchedArtists.size())
+            jobManager.addJobInBackground(new FetchArtistsJob(getActivity()));
+
         return view;
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.artists_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_empty_artists:
-                jobManager.addJobInBackground(new EmptyArtistsJob(getActivity()));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     @Override
     public void onDestroy(){
@@ -135,39 +118,22 @@ public class ArtistsFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-
         if (mNoArtists != null)
             savedInstanceState.putInt("noArtistVisibility", mNoArtists.getVisibility());
 
-        if (fetchedArtists != null) {
-            savedInstanceState.putInt("fetchedListSize", fetchedArtists.size());
-
-            if (fetchedArtists.size() > 0) {
-                ArrayList<String> ids = new ArrayList<>();
-                ArrayList<String> titles = new ArrayList<>();
-                ArrayList<String> images = new ArrayList<>();
-
-                for (int i = 0; i < fetchedArtists.size(); i++) {
-                    ids.add(i, fetchedArtists.get(i).getId());
-                    titles.add(i, fetchedArtists.get(i).getTitle());
-                    images.add(i, fetchedArtists.get(i).getImage());
-                }
-
-                savedInstanceState.putStringArrayList("ids", ids);
-                savedInstanceState.putStringArrayList("titles", titles);
-                savedInstanceState.putStringArrayList("images", images);
-            }
-        }
-        else
-            savedInstanceState.putInt("fetchedListSize", -1);
+        if (fetchedArtists != null)
+            savedInstanceState.putParcelableArrayList("fetchedList", (ArrayList<Artist>) fetchedArtists);
 
         super.onSaveInstanceState(savedInstanceState);
     }
 
+    @SuppressWarnings("unused")
     public void onEvent(ArtistsChangedEvent event) {
-        jobManager.addJobInBackground(new FetchArtistsJob(getActivity()));
+        if (event.getArtists() != null)
+            jobManager.addJobInBackground(new FetchArtistsJob(getActivity()));
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(ArtistsFetchedEvent event){
         mNoArtists.setVisibility(View.GONE);
 
@@ -177,6 +143,7 @@ public class ArtistsFragment extends Fragment {
         mStickyList.setAdapter(mAdapter);
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(NoArtistsEvent event){
         mNoArtists.setVisibility(View.VISIBLE);
 
@@ -186,6 +153,7 @@ public class ArtistsFragment extends Fragment {
         mStickyList.setAdapter(mAdapter);
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(ArtistDeletedEvent event){
         if (fetchedArtists != null) {
             if (fetchedArtists.contains(event.getArtist()))

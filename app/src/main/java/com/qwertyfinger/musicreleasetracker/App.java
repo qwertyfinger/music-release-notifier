@@ -8,15 +8,13 @@ import com.deezer.sdk.network.connect.SessionStore;
 import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.config.Configuration;
 import com.path.android.jobqueue.log.CustomLogger;
-import com.qwertyfinger.musicreleasetracker.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasetracker.entities.Artist;
 import com.qwertyfinger.musicreleasetracker.events.deezer.DeezerRequestFinEvent;
-import com.qwertyfinger.musicreleasetracker.events.release.ReleasesChangedEvent;
-import com.qwertyfinger.musicreleasetracker.events.release.ReleasesLoadedEvent;
 import com.qwertyfinger.musicreleasetracker.jobs.artist.AddArtistsJob;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import de.greenrobot.event.EventBus;
 import de.umass.lastfm.Caller;
@@ -27,6 +25,7 @@ public class App  extends Application{
     private JobManager jobManager;
     private DeezerConnect deezerConnect;
     public static boolean firstLoad = true;
+    public static Random random = new Random();
 
     public App(){
         instance = this;
@@ -63,7 +62,7 @@ public class App  extends Application{
             private static final String TAG = "JOBS";
             @Override
             public boolean isDebugEnabled() {
-                return true;
+                return false;
             }
 
             @Override
@@ -85,15 +84,9 @@ public class App  extends Application{
         jobManager = new JobManager(this, config);
     }
 
-    public void onEventBackgroundThread(ReleasesLoadedEvent event) {
-        if (event.getReleases() != null) {
-            if (!event.getReleases().isEmpty()) {
-                DatabaseHandler.getInstance(getApplicationContext()).addReleases(event.getReleases());
-                EventBus.getDefault().post(new ReleasesChangedEvent());
-            }
-        }
-    }
 
+
+    @SuppressWarnings("unused")
     public void onEventAsync(DeezerRequestFinEvent event) {
         List<Artist> outputArtists = new ArrayList<>();
 
@@ -105,13 +98,15 @@ public class App  extends Application{
                     de.umass.lastfm.Artist.search(deezerArtist.getName(), Constants.LASTFM_API_KEY);
 
             for (de.umass.lastfm.Artist lastfmArtist: lastfmArtists){
-                if (!lastfmArtist.getName().equalsIgnoreCase(deezerArtist.getName()) || lastfmArtist.getMbid().equals(""))
+                if (!lastfmArtist.getName().equalsIgnoreCase(deezerArtist.getName())
+                        || lastfmArtist.getMbid().equals(""))
                     continue;
 
                 String id = Utils.correctArtistMbid(lastfmArtist.getName());
                 if (id == null)
                     id = lastfmArtist.getMbid();
-                outputArtists.add(new com.qwertyfinger.musicreleasetracker.entities.Artist(id, lastfmArtist.getName(),
+                outputArtists.add(new com.qwertyfinger.musicreleasetracker.entities.Artist(id,
+                        lastfmArtist.getName(),
                         lastfmArtist.getImageURL(ImageSize.EXTRALARGE)));
             }
         }

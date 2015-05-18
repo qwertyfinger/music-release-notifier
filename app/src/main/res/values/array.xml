@@ -38,7 +38,6 @@
     <string-array name="notifications_entries">
         <item>Two weeks prior</item>
         <item>Week prior</item>
-        <item>3 days prior</item>
         <item>1 day prior</item>
         <item>On release day</item>
     </string-array>
@@ -46,7 +45,6 @@
     <string-array name="notifications_values">
         <item>14</item>
         <item>7</item>
-        <item>3</item>
         <item>1</item>
         <item>0</item>
     </string-array>

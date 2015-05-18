@@ -43,25 +43,23 @@ public class Utils {
     }
 
     public static void makeExtStorToast(final Context context) {
-        Handler uiHandler = new Handler(Looper.getMainLooper());
-        uiHandler.post(new Runnable() {
-            public void run() {
-                Toast.makeText(context, context.getString(R.string.external_storage_warning), Toast.LENGTH_SHORT).show();
-            }
-        });
+        makeToastNonUI(context, context.getString(R.string.external_storage_warning), Toast.LENGTH_SHORT);
     }
 
     public static void makeInternetToast(final Context context) {
-        Handler uiHandler = new Handler(Looper.getMainLooper());
-        uiHandler.post(new Runnable() {
-            public void run() {
-                Toast.makeText(context, context.getString(R.string.internet_needed_warning), Toast.LENGTH_SHORT).show();
-            }
-        });
+        makeToastNonUI(context, context.getString(R.string.internet_needed_warning), Toast.LENGTH_SHORT);
+    }
+
+    public static void makeSyncToast(final Context context) {
+        makeToastNonUI(context, "Wait until sync finishes", Toast.LENGTH_SHORT);
     }
 
     /* Checks if external storage is available for read and write */
     public static boolean isExternalStorageWritable() {
+        /*//TODO: delete in release version
+        if (Build.FINGERPRINT.startsWith("generic"))
+            return true;*/
+
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
             return true;
@@ -71,6 +69,10 @@ public class Utils {
 
     /* Checks if external storage is available to at least read */
     public static boolean isExternalStorageReadable() {
+        /*//TODO: delete in release version
+        if (Build.FINGERPRINT.startsWith("generic"))
+            return true;*/
+
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state) ||
                 Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
@@ -80,12 +82,20 @@ public class Utils {
     }
 
     public static boolean isConnected(Context context) {
+        /*//TODO: delete in release version
+        if (Build.FINGERPRINT.startsWith("generic"))
+            return true;*/
+
         ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return (networkInfo != null && networkInfo.isConnected());
     }
 
     public static boolean isWifiConnected(Context context) {
+        /*//TODO: delete in release version
+        if (Build.FINGERPRINT.startsWith("generic"))
+            return true;*/
+
         ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         return (networkInfo != null && networkInfo.isConnected());
@@ -93,6 +103,15 @@ public class Utils {
 
     public static boolean isWifiOnly(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(SettingsFragment.WIFI_ONLY, true);
+    }
+
+    public static boolean isSyncInProgress(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(SettingsFragment.SYNC_IN_PROGRESS,
+                false);
+    }
+
+    public static int generateRandom(){
+        return App.random.nextInt(30)+1;
     }
 
     /**
@@ -184,6 +203,7 @@ public class Utils {
     }
 
 //    encryption methods, unused for now
+
     /*public static void generateKey(Context context) throws NoSuchAlgorithmException {
         SecureRandom secureRandom = new SecureRandom();
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");

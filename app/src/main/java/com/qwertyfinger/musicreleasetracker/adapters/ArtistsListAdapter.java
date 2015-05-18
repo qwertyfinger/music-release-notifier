@@ -20,21 +20,43 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
-public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyListHeadersAdapter {
+public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyListHeadersAdapter /* Section Indexer */{
 
     private List<Artist> artists;
-    private final Context context;
     private JobManager jobManager;
+    private HashMap<String, Integer> mapIndex;
+//    private String[] sections;
 
     public ArtistsListAdapter(Context context, List<Artist> artists) {
         super(context, 0, artists);
-        this.context = context;
         jobManager = App.getInstance().getJobManager();
         this.artists = artists;
+
+        /*mapIndex = new LinkedHashMap<String, Integer>();
+
+        int x = 0;
+        for (Artist artist: artists) {
+            String ch = artist.getTitle().substring(0, 1).toUpperCase();
+            ch = ch.toUpperCase();
+            mapIndex.put(ch, x);
+            x++;
+        }
+
+        Set<String> sectionLetters = mapIndex.keySet();
+
+        ArrayList<String> sectionList = new ArrayList<>(sectionLetters);
+
+        Log.d("sectionList", sectionList.toString());
+        Collections.sort(sectionList);
+
+        sections = new String[sectionList.size()];
+
+        sectionList.toArray(sections);*/
     }
 
     private class ViewHolder {
@@ -54,7 +76,7 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
         final Artist artist = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.artist, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.artist, parent, false);
 
             holder = new ViewHolder();
             holder.thumbnail = (ImageView) convertView.findViewById(R.id.artistImage);
@@ -66,34 +88,35 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
             holder = (ViewHolder) convertView.getTag();
         }
 
-        convertView.findViewById(R.id.addButton).setVisibility(View.GONE);
         holder.title.setText(artist.getTitle());
 
         final View view = convertView;
-
         holder.removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                jobManager.addJobInBackground(new DeleteArtistJob(context, artist, view));
+                if (!Utils.isSyncInProgress(getContext()))
+                    jobManager.addJobInBackground(new DeleteArtistJob(getContext(), artist, view));
+                else
+                    Utils.makeSyncToast(getContext());
             }
         });
 
         if (Utils.isExternalStorageReadable()) {
-            File thumbnail = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), artist.getImage());
+            File thumbnail = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), artist.getImage());
 
-            Picasso.with(context)
+            Picasso.with(getContext())
                     .load(thumbnail)
                     .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
-                    .error(R.drawable.no_image)
-                    .tag(context)
+                    .error(R.drawable.no_artist_image)
+                    .tag(getContext())
                     .into(holder.thumbnail);
         }
 
         else {
-            Picasso.with(context)
-                    .load(R.drawable.no_image)
+            Picasso.with(getContext())
+                    .load(R.drawable.no_artist_image)
                     .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
-                    .tag(context)
+                    .tag(getContext())
                     .into(holder.thumbnail);
         }
 
@@ -105,7 +128,7 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
         HeaderViewHolder holder;
         if (convertView == null) {
             holder = new HeaderViewHolder();
-            convertView = LayoutInflater.from(context).inflate(R.layout.artists_header, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.artists_header, parent, false);
             holder.header = (TextView) convertView.findViewById(R.id.artistHeader);
             convertView.setTag(holder);
         } else {
@@ -120,11 +143,29 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> implements StickyLi
 
     @Override
     public long getHeaderId(int position) {
-        return artists.get(position).getTitle().toLowerCase().subSequence(0, 1).charAt(0);
+        return artists.get(position).getTitle().toUpperCase().subSequence(0, 1).charAt(0);
     }
 
     @Override
     public boolean isEnabled(int position) {
         return false;
     }
+
+    /*@Override
+    public Object[] getSections() {
+        return sections;
+    }
+
+    @Override
+    public int getPositionForSection(int sectionIndex) {
+        if (sectionIndex > 0) {
+            int index = sectionIndex - 1;
+        }
+        return mapIndex.get(sections[sectionIndex]);
+    }
+
+    @Override
+    public int getSectionForPosition(int position) {
+        return 0;
+    }*/
 }

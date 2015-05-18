@@ -36,12 +36,10 @@ import de.greenrobot.event.EventBus;
 
 public class SearchResultsAdapter extends ArrayAdapter<Artist> {
 
-    private final Context context;
     private JobManager jobManager;
 
     public SearchResultsAdapter(Context c, List<Artist> results){
         super(c, 0, results);
-        context = c;
         jobManager = App.getInstance().getJobManager();
         EventBus.getDefault().register(this);
     }
@@ -59,7 +57,7 @@ public class SearchResultsAdapter extends ArrayAdapter<Artist> {
         final Artist artist = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.artist, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.search_result, parent, false);
 
             holder = new ViewHolder();
             holder.thumbnail = (ImageView) convertView.findViewById(R.id.artistImage);
@@ -80,41 +78,42 @@ public class SearchResultsAdapter extends ArrayAdapter<Artist> {
 
         final View view = convertView;
 
-        DatabaseHandler db = DatabaseHandler.getInstance(context);
+        DatabaseHandler db = DatabaseHandler.getInstance(getContext());
 
         if (db.isArtistAdded(artist.getId())) {
             holder.addButton.setVisibility(View.GONE);
             holder.removeButton.setVisibility(View.VISIBLE);
 
             if (Utils.isExternalStorageReadable()) {
-                File thumbnail = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), artist.getId() + ".jpg");
+                File thumbnail = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), artist.getId() + "" +
+                        ".jpg");
 
-                Picasso.with(context)
+                Picasso.with(getContext())
                         .load(thumbnail)
                         .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
-                        .error(R.drawable.no_image)
-                        .tag(context)
+                        .error(R.drawable.no_artist_image)
+                        .tag(getContext())
                         .into(holder.thumbnail);
             } else {
                 try {
-                    Picasso.with(context)
+                    Picasso.with(getContext())
                             .load(artist.getImage())
                             .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                             .config(Bitmap.Config.RGB_565)
-                            .error(R.drawable.no_image)
+                            .error(R.drawable.no_artist_image)
                             .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
                             .centerCrop()
-                            .tag(context)
+                            .tag(getContext())
                             .into(holder.thumbnail);
                 }
                 catch (java.lang.IllegalArgumentException e){
-                    Picasso.with(context)
-                            .load(R.drawable.no_image)
+                    Picasso.with(getContext())
+                            .load(R.drawable.no_artist_image)
                             .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                             .config(Bitmap.Config.RGB_565)
                             .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
                             .centerCrop()
-                            .tag(context)
+                            .tag(getContext())
                             .into(holder.thumbnail);
                 }
             }
@@ -126,14 +125,14 @@ public class SearchResultsAdapter extends ArrayAdapter<Artist> {
             holder.addButton.setClickable(false);
 
             try {
-                Picasso.with(context)
+                Picasso.with(getContext())
                         .load(artist.getImage())
                         .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                         .config(Bitmap.Config.RGB_565)
-                        .error(R.drawable.no_image)
+                        .error(R.drawable.no_artist_image)
                         .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
                         .centerCrop()
-                        .tag(context)
+                        .tag(getContext())
                         .into(holder.thumbnail, new Callback() {
                             @Override
                             public void onSuccess() {
@@ -147,13 +146,13 @@ public class SearchResultsAdapter extends ArrayAdapter<Artist> {
                         });
             }
             catch (java.lang.IllegalArgumentException e){
-                Picasso.with(context)
-                        .load(R.drawable.no_image)
+                Picasso.with(getContext())
+                        .load(R.drawable.no_artist_image)
                         .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                         .config(Bitmap.Config.RGB_565)
                         .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
                         .centerCrop()
-                        .tag(context)
+                        .tag(getContext())
                         .into(holder.thumbnail, new Callback() {
                             @Override
                             public void onSuccess() {
@@ -171,16 +170,24 @@ public class SearchResultsAdapter extends ArrayAdapter<Artist> {
         holder.removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                jobManager.addJobInBackground(new DeleteArtistJob(context, new Artist(artist.getId(), artist.getTitle(), artist.getId() + ".jpg"), view));
+                if (!Utils.isSyncInProgress(getContext()))
+                    jobManager.addJobInBackground(new DeleteArtistJob(getContext(), new Artist(artist.getId(), artist.getTitle()
+                            , artist.getId() + ".jpg"), view));
+                else
+                    Utils.makeSyncToast(getContext());
             }
         });
 
         holder.addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<Artist> artists = new ArrayList<>();
-                artists.add(artist);
-                jobManager.addJobInBackground(new AddArtistsJob(context, artists, view));
+                if (!Utils.isSyncInProgress(getContext())) {
+                    List<Artist> artists = new ArrayList<>();
+                    artists.add(artist);
+                    jobManager.addJobInBackground(new AddArtistsJob(getContext(), artists, view));
+                }
+                else
+                    Utils.makeSyncToast(getContext());
             }
         });
 

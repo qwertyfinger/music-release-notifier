@@ -38,7 +38,7 @@ public class EmptyArtistsJob extends Job {
 
     @Override
     public void onRun() throws Throwable {
-        if (Utils.isExternalStorageWritable()) {
+        if (Utils.isExternalStorageWritable()  && !Utils.isSyncInProgress(context)) {
             DatabaseHandler db = DatabaseHandler.getInstance(context);
 
             if (db.getArtistsCount() > 0) {
@@ -53,8 +53,12 @@ public class EmptyArtistsJob extends Job {
                 jobManager.addJobInBackground(new EmptyReleasesJob(context));
                 Utils.makeToastNonUI(context, "Artists Emptied", Toast.LENGTH_SHORT);
             }
-        } else
-            Utils.makeExtStorToast(context);
+        } else {
+            if (!Utils.isExternalStorageWritable())
+                Utils.makeExtStorToast(context);
+            if (Utils.isSyncInProgress(context))
+                Utils.makeSyncToast(context);
+        }
     }
 
     @Override

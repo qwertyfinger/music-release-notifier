@@ -1,11 +1,11 @@
 <resources>
-    <string name="app_name">MRT</string>
+    <string name="app_name">Music Release Tracker</string>
     <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
     <string name="action_add_subscription">Add subscription</string>
     <string name="title_activity_add_subscriptions">Add subscriptions</string>
     <string name="search_hint">Search artists</string>
-    <string name="action_refresh">Refresh</string>
+    <string name="action_refresh">Refresh releases</string>
     <string name="action_empty_releases">Empty releases</string>
     <string name="action_empty_artists">Empty artists</string>
     <string name="noSearchResults">Sorry, couldn\'t find anything</string>
@@ -65,13 +65,18 @@
     <string name="lastfm_wrong_username">Wrong username</string>
     <string name="internet_needed_warning">Need internet connection</string>
     <string name="external_storage_warning">Need available external storage</string>
-    <string name="lastfm_dialog_message">Enter username to get artists from your library, set plays threshold for artist to be added</string>
+    <string name="lastfm_dialog_message">Enter username, set plays threshold for artist to be added</string>
     <string name="log_in_button">Log in</string>
     <string name="cancel_button">Cancel</string>
     <string name="deezer_logout_message">You are already signed in, would you like to log out?</string>
     <string name="logout_button">Log out</string>
     <string name="deezer_signin_message">Proceed to Deezer sign in page to get artists from your library?</string>
     <string name="ok_button">OK</string>
-    <string name="lastfm_threshold">Plays threshold...</string>
+    <string name="lastfm_threshold">Plays threshold</string>
     <string name="lastfm_invalid_threshold">Invalid threshold</string>
+    <string name="sync_with_lastfm">Sync with Last.fm</string>
+    <string name="sync_with_deezer">Sync with Deezer</string>
+    <string name="main_activity_name">MRT</string>
+    <string name="sync_message">Sync is in progress…</string>
+    <string name="pref_notification_summary">Time to notify before release\'s coming out</string>
 </resources>

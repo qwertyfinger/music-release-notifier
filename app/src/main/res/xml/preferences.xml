@@ -29,6 +29,7 @@
         android:key="notifications"
         android:title="@string/notifications"
         android:dialogTitle="@string/notifications"
+        android:summary="@string/pref_notification_summary"
         android:entries="@array/notifications_entries"
         android:entryValues="@array/notifications_values"
         android:defaultValue="@array/notifications_default_value" />

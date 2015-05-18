@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.view.View;
 
 import com.path.android.jobqueue.Job;
@@ -19,6 +20,8 @@ import com.qwertyfinger.musicreleasetracker.entities.Artist;
 import com.qwertyfinger.musicreleasetracker.events.artist.ArtistAddedEvent;
 import com.qwertyfinger.musicreleasetracker.events.artist.ArtistLoadedEvent;
 import com.qwertyfinger.musicreleasetracker.events.artist.ArtistsChangedEvent;
+import com.qwertyfinger.musicreleasetracker.events.sync.SyncFinishedEvent;
+import com.qwertyfinger.musicreleasetracker.fragments.SettingsFragment;
 import com.qwertyfinger.musicreleasetracker.jobs.release.RefreshReleasesJob;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -59,10 +62,12 @@ public class AddArtistsJob extends Job{
 
     @Override
     public void onAdded() {
+
     }
 
     @Override
     public void onRun() throws Throwable {
+
         if (Utils.isExternalStorageWritable() && Utils.isConnected(context)) {
 
             target = new Target[artists.size()];
@@ -72,11 +77,12 @@ public class AddArtistsJob extends Job{
 
             finalArtists = new ArrayList<>();
             int counter = 0;
-            for(final Artist artist: artists) {
+            for (final Artist artist : artists) {
                 if (!db.isArtistAdded(artist.getId())) {
                     final String imageUrl = artist.getImage();
                     final String filename = artist.getId() + ".jpg";
 
+                    finalArtists.add(new Artist(artist.getId(), artist.getTitle(), filename));
 
                     target[counter] = new Target() {
                         @Override
@@ -87,19 +93,11 @@ public class AddArtistsJob extends Job{
                                 File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename);
                                 out = new FileOutputStream(file);
                             } catch (FileNotFoundException e) {
-                                e.printStackTrace();
                             }
 
                             bitmap.compress(Bitmap.CompressFormat.JPEG, 60, out);
 
-                            if (actionId == Constants.ARTIST_USER_ADD) {
-                                List<Artist> oneArtist = new ArrayList<>();
-                                oneArtist.add(new Artist(artist.getId(), artist.getTitle(), filename));
-                                db.addArtists(oneArtist);
-                                EventBus.getDefault().post(new ArtistAddedEvent(artist, view));
-                            } else
-                                EventBus.getDefault().post(new ArtistLoadedEvent());
-
+                            EventBus.getDefault().post(new ArtistLoadedEvent());
                         }
 
                         @Override
@@ -122,14 +120,14 @@ public class AddArtistsJob extends Job{
                                         .load(imageUrl)
                                         .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                                         .config(Bitmap.Config.RGB_565)
-                                        .error(R.drawable.no_image)
+                                        .error(R.drawable.no_artist_image)
                                         .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
                                         .centerCrop()
                                         .tag(context)
                                         .into(target[i]);
                             } catch (IllegalArgumentException e) {
                                 Picasso.with(context)
-                                        .load(R.drawable.no_image)
+                                        .load(R.drawable.no_artist_image)
                                         .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                                         .config(Bitmap.Config.RGB_565)
                                         .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
@@ -139,17 +137,20 @@ public class AddArtistsJob extends Job{
                             }
                         }
                     });
-
                     counter++;
-                    finalArtists.add(new Artist(artist.getId(), artist.getTitle(), filename));
+
+                }
+                if (finalArtists.size() == 0) {
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SettingsFragment
+                            .SYNC_IN_PROGRESS, false).commit();
+                    EventBus.getDefault().post(new SyncFinishedEvent());
                 }
             }
-        }
-        else {
-            if (!Utils.isConnected(context))
-                Utils.makeInternetToast(context);
+        } else {
             if (!Utils.isExternalStorageWritable())
                 Utils.makeExtStorToast(context);
+            if (!Utils.isConnected(context))
+                Utils.makeInternetToast(context);
             if (EventBus.getDefault().isRegistered(this))
                 EventBus.getDefault().unregister(this);
         }
@@ -157,8 +158,7 @@ public class AddArtistsJob extends Job{
 
     @Override
     protected void onCancel() {
-        if (EventBus.getDefault().isRegistered(this))
-            EventBus.getDefault().unregister(this);
+
     }
 
     @Override
@@ -169,13 +169,24 @@ public class AddArtistsJob extends Job{
     }
 
     private int counter;
+    @SuppressWarnings("unused")
     public void onEvent(ArtistLoadedEvent event) {
-        counter++;
-        if (counter == finalArtists.size()) {
-            DatabaseHandler.getInstance(context).addArtists(finalArtists);
-            EventBus.getDefault().post(new ArtistsChangedEvent());
+        if (actionId == Constants.ARTIST_USER_ADD) {
+            List<Artist> list = new ArrayList<>(1);
+            list.add(finalArtists.get(0));
+            DatabaseHandler.getInstance(context).addArtists(list);
+            EventBus.getDefault().post(new ArtistAddedEvent(finalArtists.get(0), view));
             EventBus.getDefault().unregister(this);
-            App.getInstance().getJobManager().addJobInBackground(new RefreshReleasesJob(context, Constants.AFTER_ADDING_REFRESH, finalArtists));
+        }
+        else {
+            counter++;
+            if (counter == finalArtists.size()) {
+                DatabaseHandler.getInstance(context).addArtists(finalArtists);
+                EventBus.getDefault().post(new ArtistsChangedEvent(finalArtists));
+                App.getInstance().getJobManager().addJobInBackground(new RefreshReleasesJob(context, Constants
+                        .AFTER_SYNC_REFRESH, finalArtists));
+                EventBus.getDefault().unregister(this);
+            }
         }
     }
 }

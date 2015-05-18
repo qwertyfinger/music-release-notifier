@@ -1,5 +1,7 @@
 package com.qwertyfinger.musicreleasetracker.entities;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import java.text.DateFormat;
@@ -7,7 +9,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
-public class Release implements Comparable<Release> {
+public class Release implements Comparable<Release>, Parcelable {
     private String id;
     private String title;
     private String artist;
@@ -54,6 +56,25 @@ public class Release implements Comparable<Release> {
     }
 
     @Override
+    public boolean equals(Object object){
+        if (object == null) return false;
+        if (object == this) return true;
+        if (!(object instanceof Release)) return false;
+        Release other = (Release) object;
+
+        if (id.equals(other.id) && title.equals(other.title) && artist.equals(other.artist) && releaseDate.equals
+                (other.releaseDate) && image.equals(other.image))
+            return true;
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
     public int compareTo(@NonNull Release other) {
         DateFormat formatter = DateFormat.getDateInstance(DateFormat.LONG);
         Date date1 = Calendar.getInstance().getTime();
@@ -75,4 +96,41 @@ public class Release implements Comparable<Release> {
     public String getArtistId() {
         return artistId;
     }
+
+    protected Release(Parcel in) {
+        id = in.readString();
+        title = in.readString();
+        artist = in.readString();
+        releaseDate = in.readString();
+        image = in.readString();
+        artistId = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(title);
+        dest.writeString(artist);
+        dest.writeString(releaseDate);
+        dest.writeString(image);
+        dest.writeString(artistId);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Release> CREATOR = new Parcelable.Creator<Release>() {
+        @Override
+        public Release createFromParcel(Parcel in) {
+            return new Release(in);
+        }
+
+        @Override
+        public Release[] newArray(int size) {
+            return new Release[size];
+        }
+    };
 }

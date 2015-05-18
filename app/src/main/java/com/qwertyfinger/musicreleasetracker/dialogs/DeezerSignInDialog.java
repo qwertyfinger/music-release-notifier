@@ -18,7 +18,11 @@ import com.deezer.sdk.network.connect.event.DialogListener;
 import com.qwertyfinger.musicreleasetracker.App;
 import com.qwertyfinger.musicreleasetracker.R;
 import com.qwertyfinger.musicreleasetracker.Utils;
+import com.qwertyfinger.musicreleasetracker.events.deezer.LoggedInDeezerEvent;
+import com.qwertyfinger.musicreleasetracker.events.deezer.LoggedOutDeezerEvent;
 import com.qwertyfinger.musicreleasetracker.fragments.SettingsFragment;
+
+import de.greenrobot.event.EventBus;
 
 public class DeezerSignInDialog extends DialogPreference {
 
@@ -78,6 +82,8 @@ public class DeezerSignInDialog extends DialogPreference {
                     SessionStore sessionStore = new SessionStore();
                     sessionStore.save(deezerConnect, App.getInstance().getApplicationContext());
 
+                    EventBus.getDefault().post(new LoggedInDeezerEvent());
+
                     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext());
                     SharedPreferences.Editor editor = settings.edit();
                     editor.putBoolean(SettingsFragment.DEEZER, true);
@@ -95,6 +101,8 @@ public class DeezerSignInDialog extends DialogPreference {
         }
         else {
             deezerConnect.logout(getContext());
+
+            EventBus.getDefault().post(new LoggedOutDeezerEvent());
 
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext());
             SharedPreferences.Editor editor = settings.edit();

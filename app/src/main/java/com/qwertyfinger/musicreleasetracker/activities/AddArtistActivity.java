@@ -33,7 +33,6 @@ import com.qwertyfinger.musicreleasetracker.events.ReleaseAdapterEvent;
 import com.qwertyfinger.musicreleasetracker.events.artist.ArtistAddedEvent;
 import com.qwertyfinger.musicreleasetracker.events.artist.ArtistDeletedEvent;
 import com.qwertyfinger.musicreleasetracker.events.artist.ArtistExistsEvent;
-import com.qwertyfinger.musicreleasetracker.events.artist.ArtistsChangedEvent;
 import com.qwertyfinger.musicreleasetracker.events.search.SearchQueryEvent;
 import com.qwertyfinger.musicreleasetracker.events.search.SearchingEvent;
 import com.qwertyfinger.musicreleasetracker.jobs.artist.FetchArtistsJob;
@@ -49,6 +48,8 @@ import de.greenrobot.event.EventBus;
 public class AddArtistActivity extends AppCompatActivity{
 
     private List<Artist> addedArtists = null;
+    private List<Artist> deletedArtists = null;
+
     private JobManager jobManager;
     private ProgressBar spinner;
     private TextView noResult;
@@ -91,38 +92,16 @@ public class AddArtistActivity extends AppCompatActivity{
             searchQuery = savedInstanceState.getCharSequence("searchQuery");
             searchFocus = savedInstanceState.getBoolean("searchFocus");
 
-            int addedListSize = savedInstanceState.getInt("addedListSize");
-            if (addedListSize != -1) {
-                if (addedListSize > 0) {
-                    List<String> ids = savedInstanceState.getStringArrayList("ids");
-                    List<String> titles = savedInstanceState.getStringArrayList("titles");
-                    List<String> images = savedInstanceState.getStringArrayList("images");
+            addedArtists = savedInstanceState.getParcelableArrayList("addedList");
 
-                    if (addedArtists == null)
-                        addedArtists = new ArrayList<>();
+            deletedArtists = savedInstanceState.getParcelableArrayList("deletedArtist");
 
-                    for (int i = 0; i < savedInstanceState.getInt("addedListSize"); i++) {
-                        addedArtists.add(i, new Artist(ids.get(i), titles.get(i), images.get(i)));
-                    }
-                }
-            }
-
-            int searchListSize = savedInstanceState.getInt("searchListSize");
-            if (searchListSize != -1) {
-                if (searchListSize > 0) {
-                    List<String> ids = savedInstanceState.getStringArrayList("ids2");
-                    List<String> titles = savedInstanceState.getStringArrayList("titles2");
-                    List<String> images = savedInstanceState.getStringArrayList("images2");
-
-                    if (searchResults == null)
-                        searchResults = new ArrayList<>();
-
-                    for (int i = 0; i < savedInstanceState.getInt("searchListSize"); i++) {
-                        searchResults.add(i, new Artist(ids.get(i), titles.get(i), images.get(i)));
-                    }
-                    listView.setEmptyView((TextView) findViewById(R.id.noResult));
-                    listView.setAdapter(new SearchResultsAdapter(this, searchResults));
-                }
+            searchResults = savedInstanceState.getParcelableArrayList("searchList");
+            if (searchResults == null)
+                searchResults = new ArrayList<>();
+            if (searchResults.size() > 0) {
+                listView.setEmptyView((TextView) findViewById(R.id.noResult));
+                listView.setAdapter(new SearchResultsAdapter(this, searchResults));
             }
         }
 
@@ -151,10 +130,6 @@ public class AddArtistActivity extends AppCompatActivity{
 
     @Override
     protected void onNewIntent(Intent intent) {
-        // Because this activity has set launchMode="singleTop", the system calls this method
-        // to deliver the intent if this activity is currently the foreground activity when
-        // invoked again (when the user executes a search from this activity, we don't create
-        // a new instance of this activity, so the system delivers the search intent here)
         handleIntent(intent);
     }
 
@@ -205,9 +180,21 @@ public class AddArtistActivity extends AppCompatActivity{
 
                 if (addedArtists != null) {
                     if (!addedArtists.isEmpty()) {
-                        jobManager.addJobInBackground(new FetchArtistsJob(activity));
-                        EventBus.getDefault().post(new ArtistsChangedEvent());
+                        if (!App.firstLoad)
+                            jobManager.addJobInBackground(new FetchArtistsJob(activity));
                         jobManager.addJobInBackground(new RefreshReleasesJob(activity, Constants.AFTER_ADDING_REFRESH, addedArtists));
+                    }
+                    else {
+                        if (deletedArtists != null) {
+                            if (!deletedArtists.isEmpty())
+                                jobManager.addJobInBackground(new FetchArtistsJob(activity));
+                        }
+                    }
+                }
+                else {
+                    if (deletedArtists != null) {
+                        if (!deletedArtists.isEmpty())
+                            jobManager.addJobInBackground(new FetchArtistsJob(activity));
                     }
                 }
                 return false;
@@ -232,7 +219,7 @@ public class AddArtistActivity extends AppCompatActivity{
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
     }
 
@@ -265,59 +252,26 @@ public class AddArtistActivity extends AppCompatActivity{
         else
             savedInstanceState.putCharSequence("searchQuery", "");
 
-        if (addedArtists != null) {
-            savedInstanceState.putInt("addedListSize", addedArtists.size());
+        if (addedArtists != null)
+            savedInstanceState.putParcelableArrayList("addedList", (ArrayList<Artist>) addedArtists);
 
-            if (addedArtists.size() > 0) {
-                ArrayList<String> ids = new ArrayList<>();
-                ArrayList<String> titles = new ArrayList<>();
-                ArrayList<String> images = new ArrayList<>();
+        if (deletedArtists != null)
+            savedInstanceState.putParcelableArrayList("deletedList", (ArrayList<Artist>) deletedArtists);
 
-                for (int i = 0; i < addedArtists.size(); i++) {
-                    ids.add(i, addedArtists.get(i).getId());
-                    titles.add(i, addedArtists.get(i).getTitle());
-                    images.add(i, addedArtists.get(i).getImage());
-                }
-
-                savedInstanceState.putStringArrayList("ids", ids);
-                savedInstanceState.putStringArrayList("titles", titles);
-                savedInstanceState.putStringArrayList("images", images);
-            }
-        }
-        else
-            savedInstanceState.putInt("addedListSize", -1);
-
-        if (searchResults != null) {
-            savedInstanceState.putInt("searchListSize", searchResults.size());
-
-            if (searchResults.size() > 0) {
-                ArrayList<String> ids = new ArrayList<>();
-                ArrayList<String> titles = new ArrayList<>();
-                ArrayList<String> images = new ArrayList<>();
-
-                for (int i = 0; i < searchResults.size(); i++) {
-                    ids.add(i, searchResults.get(i).getId());
-                    titles.add(i, searchResults.get(i).getTitle());
-                    images.add(i, searchResults.get(i).getImage());
-                }
-
-                savedInstanceState.putStringArrayList("ids2", ids);
-                savedInstanceState.putStringArrayList("titles2", titles);
-                savedInstanceState.putStringArrayList("images2", images);
-            }
-        }
-        else
-            savedInstanceState.putInt("searchListSize", -1);
+        if (searchResults != null)
+            savedInstanceState.putParcelableArrayList("searchList", (ArrayList<Artist>) searchResults);
 
         super.onSaveInstanceState(savedInstanceState);
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(SearchingEvent event){
         empty.setVisibility(View.GONE);
         noResult.setVisibility(View.GONE);
         spinner.setVisibility(View.VISIBLE);
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(SearchQueryEvent event) {
         spinner.setVisibility(View.GONE);
 
@@ -329,10 +283,14 @@ public class AddArtistActivity extends AppCompatActivity{
         listView.setAdapter(new SearchResultsAdapter(this, searchResults));
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(ArtistAddedEvent event) {
         if (addedArtists == null)
             addedArtists = new ArrayList<>();
         addedArtists.add(event.getArtist());
+
+        if (deletedArtists != null)
+            deletedArtists.remove(event.getArtist());
 
         CharSequence text = "Added " + event.getArtist().getTitle();
         Utils.makeToast(this, Toast.LENGTH_SHORT, 1000, text);
@@ -348,14 +306,20 @@ public class AddArtistActivity extends AppCompatActivity{
         }
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(ArtistDeletedEvent event) {
         if (addedArtists != null)
             addedArtists.remove(event.getArtist());
+
+        if (deletedArtists == null)
+            deletedArtists = new ArrayList<>();
+        deletedArtists.add(event.getArtist());
 
         CharSequence text = "Removed " + event.getArtist().getTitle();
         Utils.makeToast(this, Toast.LENGTH_SHORT, 1000, text);
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(ArtistExistsEvent event){
         CharSequence text = "You are already subscribed to this artist";
         Utils.makeToast(this, Toast.LENGTH_SHORT, 1000, text);

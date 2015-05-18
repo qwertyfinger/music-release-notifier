@@ -107,15 +107,13 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
     public Release getRelease(String id){
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(ReleasesContract.ReleasesTable.TABLE_NAME, new String[]{ReleasesContract.ReleasesTable.COLUMN_NAME_ID,
-                        ReleasesContract.ReleasesTable.COLUMN_NAME_TITLE, ReleasesContract.ReleasesTable.COLUMN_NAME_ARTIST,
-                        ReleasesContract.ReleasesTable.COLUMN_NAME_DATE, ReleasesContract.ReleasesTable.COLUMN_NAME_IMAGE},
-                ReleasesContract.ReleasesTable.COLUMN_NAME_ID + "=?",
-                new String[]{id}, null, null, null, null);
-        if (cursor != null)
-            cursor.moveToFirst();
+        String selectQuery = "SELECT  * FROM " + ReleasesContract.ReleasesTable.TABLE_NAME + " WHERE " + ReleasesContract.ReleasesTable.COLUMN_NAME_ID
+                + " = '" + id +"'";
+        Cursor cursor = db.rawQuery(selectQuery, null);
 
-        Release release = new Release(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4));
+        Release release = null;
+        if (cursor != null && cursor.moveToFirst())
+            release = new Release(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4));
 
         if(cursor != null && !cursor.isClosed()){
             cursor.close();
@@ -172,15 +170,18 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
         return releaseList;
     }
 
+    public void deleteRelease(String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(ReleasesContract.ReleasesTable.TABLE_NAME, ReleasesContract.ReleasesTable.COLUMN_NAME_ID + " = ?", new String[]{id});
+    }
+
     public void deleteReleasesByArtist(String id) {
         SQLiteDatabase db = this.getWritableDatabase();
-
         db.delete(ReleasesContract.ReleasesTable.TABLE_NAME, ReleasesContract.ReleasesTable.COLUMN_NAME_ARTISTID + " = ?", new String[]{id});
     }
 
     public void deleteAllReleases(){
         SQLiteDatabase db = this.getWritableDatabase();
-
         db.execSQL("DELETE FROM " + ReleasesContract.ReleasesTable.TABLE_NAME);
     }
 
@@ -265,10 +266,10 @@ public class DatabaseHandler  extends SQLiteOpenHelper{
     public Artist getArtist(String id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(ArtistsContract.ArtistsTable.TABLE_NAME, new String[] {ArtistsContract.ArtistsTable.COLUMN_NAME_ID,
-                        ArtistsContract.ArtistsTable.COLUMN_NAME_TITLE, ArtistsContract.ArtistsTable.COLUMN_NAME_IMAGE },
-                ArtistsContract.ArtistsTable.COLUMN_NAME_ID + "=?",
-                new String[] { id }, null, null, null, null);
+        String selectQuery = "SELECT  * FROM " + ArtistsContract.ArtistsTable.TABLE_NAME + " WHERE " + ArtistsContract.ArtistsTable.COLUMN_NAME_ID
+                + " = '" + id +"'";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
         if (cursor != null)
             cursor.moveToFirst();
 

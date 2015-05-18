@@ -28,11 +28,9 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 public class ReleasesListAdapter extends ArrayAdapter<Release> implements StickyListHeadersAdapter {
 
     private List<Release> releases;
-    private final Context context;
 
     public ReleasesListAdapter(Context context, List<Release> releases) {
         super(context, 0, releases);
-        this.context = context;
         this.releases = releases;
     }
 
@@ -54,7 +52,7 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
         final Release release = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.release, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.release, parent, false);
 
             holder = new ViewHolder();
             holder.thumbnail = (ImageView) convertView.findViewById(R.id.releaseCover);
@@ -72,20 +70,20 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
         holder.date.setText(release.getDate());
 
         if (Utils.isExternalStorageReadable()) {
-            File thumbnail = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), release.getImage());
+            File thumbnail = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), release.getImage());
 
-            Picasso.with(context)
+            Picasso.with(getContext())
                     .load(thumbnail)
                     .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
-                    .error(R.drawable.no_image)
-                    .tag(context)
+                    .error(R.drawable.no_album_image)
+                    .tag(getContext())
                     .into(holder.thumbnail);
         }
         else {
-            Picasso.with(context)
-                    .load(R.drawable.no_image)
+            Picasso.with(getContext())
+                    .load(R.drawable.no_album_image)
                     .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
-                    .tag(context)
+                    .tag(getContext())
                     .into(holder.thumbnail);
         }
 
@@ -97,7 +95,7 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
         HeaderViewHolder holder;
         if (convertView == null) {
             holder = new HeaderViewHolder();
-            convertView = LayoutInflater.from(context).inflate(R.layout.releases_header, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.releases_header, parent, false);
             holder.header = (TextView) convertView.findViewById(R.id.releaseHeader);
             convertView.setTag(holder);
         } else {
@@ -114,13 +112,14 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
 
-        String headerText = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, context.getResources().getConfiguration().locale);
+        String headerText = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, getContext().getResources().getConfiguration
+                ().locale);
 
         if (Locale.getDefault().getLanguage().equals("uk"))
-            headerText = Utils.convertMonth(context, true, calendar.get(Calendar.MONTH));
+            headerText = Utils.convertMonth(getContext(), true, calendar.get(Calendar.MONTH));
 
         if (Locale.getDefault().getLanguage().equals("ru"))
-            headerText = Utils.convertMonth(context, false, calendar.get(Calendar.MONTH));
+            headerText = Utils.convertMonth(getContext(), false, calendar.get(Calendar.MONTH));
 
         holder.header.setText(headerText);
 

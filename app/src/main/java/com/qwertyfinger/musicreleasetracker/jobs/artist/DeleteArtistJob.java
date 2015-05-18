@@ -41,7 +41,7 @@ public class DeleteArtistJob extends Job {
     @Override
     public void onRun() throws Throwable {
 
-        if (Utils.isExternalStorageWritable()) {
+        if (Utils.isExternalStorageWritable()  && !Utils.isSyncInProgress(context)) {
             DatabaseHandler db = DatabaseHandler.getInstance(context);
             db.deleteArtist(artist.getId());
             List<Release> releases = db.getReleasesByArtist(artist.getId());
@@ -63,8 +63,12 @@ public class DeleteArtistJob extends Job {
             if (db.getArtistsCount() == 0)
                 EventBus.getDefault().post(new NoArtistsEvent());
         }
-        else
-            Utils.makeExtStorToast(context);
+        else {
+            if (!Utils.isExternalStorageWritable())
+                Utils.makeExtStorToast(context);
+            if (Utils.isSyncInProgress(context))
+                Utils.makeSyncToast(context);
+        }
     }
 
     @Override
