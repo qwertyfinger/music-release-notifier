@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Music Release Tracker</string>
+    <string name="app_name">Music Release Notifier</string>
     <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
     <string name="action_add_subscription">Add subscription</string>
@@ -76,7 +76,7 @@
     <string name="lastfm_invalid_threshold">Invalid threshold</string>
     <string name="sync_with_lastfm">Sync with Last.fm</string>
     <string name="sync_with_deezer">Sync with Deezer</string>
-    <string name="main_activity_name">MRT</string>
+    <string name="main_activity_name">Music Release Notifier</string>
     <string name="sync_message">Sync is in progress…</string>
-    <string name="pref_notification_summary">Time to notify before release\'s coming out</string>
+    <string name="cancel_button_description">cancelButton</string>
 </resources>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/search_result_list_image_size"
+    android:orientation="horizontal">
+    <ImageView
+        android:id="@+id/artistImage"
+        android:layout_width="@dimen/search_result_list_image_size"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/thumbnailDescription" />
+
+    <TextView
+        android:id="@+id/artistTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp"
+        android:paddingRight="10dp"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:layout_weight="1"
+        android:layout_gravity="center" />
+
+    <ImageButton
+        android:id="@+id/removeButton"
+        android:src="@drawable/ic_action_remove"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="5dp"
+        android:contentDescription="@string/controlRemoveDescription" />
+
+    <ImageButton
+        android:id="@+id/addButton"
+        android:src="@drawable/ic_action_new"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_vertical"
+        android:contentDescription="@string/controlAddDescription"
+        android:layout_marginRight="5dp"/>
+
+</LinearLayout>

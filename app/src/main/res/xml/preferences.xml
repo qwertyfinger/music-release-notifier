@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:mrt="http://schemas.android.com/apk/res/com.qwertyfinger.musicreleasetracker">
+    xmlns:app="http://schemas.android.com/apk/res/com.qwertyfinger.musicreleasetracker">
 
     <CheckBoxPreference
         android:key="wifi_only"
@@ -17,19 +17,18 @@
         android:defaultValue="5" />
 
     <!-- For future implementation-->
-   <!-- <MultiSelectListPreference
+    <MultiSelectListPreference
         android:key="subscriptions"
         android:title="@string/subscriptions"
         android:dialogTitle="@string/subscriptions"
         android:entries="@array/subscriptions_entries"
         android:entryValues="@array/subscriptions_values"
-        android:defaultValue="@array/subscriptions_default_value" />-->
+        android:defaultValue="@array/subscriptions_default_value" />
 
     <MultiSelectListPreference
         android:key="notifications"
         android:title="@string/notifications"
         android:dialogTitle="@string/notifications"
-        android:summary="@string/pref_notification_summary"
         android:entries="@array/notifications_entries"
         android:entryValues="@array/notifications_values"
         android:defaultValue="@array/notifications_default_value" />
@@ -39,8 +38,7 @@
         android:title="@string/lastfm"
         android:dialogTitle="@string/lastfm_dialog"
         android:dialogLayout="@layout/lastfm_dialog"
-        mrt:signInService="lastfm"
-        android:defaultValue=""/>
+        android:defaultValue=" "/>
 
     <com.qwertyfinger.musicreleasetracker.dialogs.DeezerSignInDialog
         android:key="deezer"
