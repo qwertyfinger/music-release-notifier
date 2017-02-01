@@ -4,20 +4,18 @@ import android.content.Context;
 import android.preference.PreferenceManager;
 
 import com.path.android.jobqueue.Job;
-import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.Params;
-import com.qwertyfinger.musicreleasesnotifier.App;
 import com.qwertyfinger.musicreleasesnotifier.BuildConfig;
 import com.qwertyfinger.musicreleasesnotifier.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasesnotifier.entities.Artist;
 import com.qwertyfinger.musicreleasesnotifier.entities.Release;
 import com.qwertyfinger.musicreleasesnotifier.events.artist.NoArtistsEvent;
+import com.qwertyfinger.musicreleasesnotifier.events.release.ReleasesChangedEvent;
 import com.qwertyfinger.musicreleasesnotifier.events.sync.SyncFinishedEvent;
 import com.qwertyfinger.musicreleasesnotifier.events.sync.SyncInProgressEvent;
 import com.qwertyfinger.musicreleasesnotifier.fragments.SettingsFragment;
 import com.qwertyfinger.musicreleasesnotifier.misc.Constants;
 import com.qwertyfinger.musicreleasesnotifier.misc.Utils;
-import com.squareup.picasso.Target;
 
 import de.greenrobot.event.EventBus;
 import de.umass.lastfm.Album;
@@ -31,7 +29,6 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -74,51 +71,82 @@ public class RefreshReleasesJob extends Job{
 
         DatabaseHandler db = DatabaseHandler.getInstance(context);
 
-        if (db.getArtistsCount() == 0 && actionId == Constants.EXPLICIT_REFRESH) {
+        int artistCount = db.getArtistsCount();
+
+        if (artistCount == 0 && actionId == Constants.EXPLICIT_REFRESH) {
             EventBus.getDefault().post(new NoArtistsEvent());
         }
 
-        if (db.getArtistsCount() != 0) {
+        if (artistCount != 0) {
+
             EventBus.getDefault().post(new SyncInProgressEvent());
 
             PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SettingsFragment.SYNC_IN_PROGRESS,
                     true).apply();
 
-//            EventBus.getDefault().register(this);
-
-            final List<Artist> artists;
-            if (addedArtists != null)
+            List<Artist> artists;
+            if (addedArtists != null){
                 artists = addedArtists;
-            else
+            }
+            else {
                 artists = db.getAllArtists();
+            }
 
             Caller.getInstance().setUserAgent(Constants.LASTFM_USER_AGENT);
             Caller.getInstance().setCache(null);
 
-            int i = 0;
 
-            StringBuilder sb = new StringBuilder("(");
 
-            for (int k = 0; k < artists.size()-1; k++) {
+            List<ReleaseResultWs2> results = new ArrayList<>();
+
+            StringBuilder sb = new StringBuilder();
+
+            if (artists.size() == 1) {
+                sb.append("(");
                 sb.append("arid:");
-                sb.append(artists.get(k).getId());
-                sb.append(" OR ");
+                sb.append(artists.get(0).getId());
+                sb.append(")");
+
+                int year = Calendar.getInstance().get(Calendar.YEAR);
+                org.musicbrainz.controller.Release release = new org.musicbrainz.controller.Release();
+
+                release.search(sb + " AND primarytype:album AND status:official AND (date:" + (year) + "-??-?? || date:"
+                        + (++year)
+                        + "-??-?? || date:" + (++year) + "-??-??)");
+
+                results.addAll(release.getFullSearchResultList());
+
+            } else {
+                for (int i = 0; i < artists.size(); i += 25) {
+                    sb.append("(");
+
+                    for (int k = i; k < i+24; k++) {
+
+                        if (k >= artists.size()) break;
+
+                        sb.append("arid:");
+                        sb.append(artists.get(k).getId());
+                        sb.append(" OR ");
+                    }
+
+                    sb.append("arid:");
+                    sb.append(artists.get(artists.size()-1).getId());
+                    sb.append(")");
+
+                    int year = Calendar.getInstance().get(Calendar.YEAR);
+                    org.musicbrainz.controller.Release release = new org.musicbrainz.controller.Release();
+
+                    release.search(sb + " AND primarytype:album AND status:official AND (date:" + (year) + "-??-?? || date:"
+                            + (++year)
+                            + "-??-?? || date:" + (++year) + "-??-??)");
+
+                    results.addAll(release.getFullSearchResultList());
+                    sb.setLength(0);
+                }
             }
 
-            sb.append("arid:");
-            sb.append(artists.get(artists.size()-1).getId());
-            sb.append(")");
-
-            i++;
             Map<String, ReleaseWs2> map = new HashMap<>();
             Map<String, String> idMap = new HashMap<>();
-            int year = Calendar.getInstance().get(Calendar.YEAR);
-            org.musicbrainz.controller.Release release = new org.musicbrainz.controller.Release();
-
-            release.search(sb + " AND primarytype:album AND status:official AND (date:" + (year) + "-??-?? || date:"
-                    + (++year)
-                    + "-??-?? || date:" + (++year) + "-??-??)");
-            List<ReleaseResultWs2> results = release.getFullSearchResultList();
 
             for (ReleaseResultWs2 entry : results) {
 
@@ -151,98 +179,32 @@ public class RefreshReleasesJob extends Job{
                 }
             }
 
-            if (map.isEmpty() && i == artists.size()) {
-                EventBus.getDefault().post(new ReleasesLoadedEvent());
-            }
+            if (!map.isEmpty()) {
 
-            final Iterator<String> iterator = map.keySet().iterator();
+                for (String key : map.keySet()) {
+                    ReleaseWs2 entry = map.get(key);
 
-            while (iterator.hasNext()) {
-                String key = iterator.next();
-                ReleaseWs2 entry = map.get(key);
+                    Album album = Album.getInfo(entry.getArtistCreditString(), entry.getTitle(), BuildConfig.LAST_FM_API_KEY);
+                    final String imageUrl = album.getImageURL(ImageSize.EXTRALARGE);
+                    //                final int counter = i;
 
-                Album album = Album.getInfo(entry.getArtistCreditString(), entry.getTitle(), BuildConfig.LAST_FM_API_KEY);
-                final String imageUrl = album.getImageURL(ImageSize.EXTRALARGE);
-//                final int counter = i;
+                    DateFormat defaultFormatter = DateFormat.getDateInstance(DateFormat.LONG);
 
-                DateFormat defaultFormatter = DateFormat.getDateInstance(DateFormat.LONG);
-
-                resultForDatabase.add(new Release(entry.getReleaseGroup().getId(),
-                        entry.getTitle(), entry.getArtistCreditString(),
-                        defaultFormatter.format(map.get(key).getDate()), imageUrl, idMap.get(key)));
-
-                JobManager jobManager = App.getInstance().getJobManager();
-
-                if (!resultForDatabase.isEmpty()) {
-                    db.addReleases(resultForDatabase);
-                    jobManager.addJobInBackground(new FetchReleasesJob(context));
-                    jobManager.addJobInBackground(new ShowNotificationJob(context, resultForDatabase));
-                }
-                else
-                    jobManager.addJobInBackground(new FetchReleasesJob(context));
-
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SettingsFragment
-                        .SYNC_IN_PROGRESS, false).apply();
-                EventBus.getDefault().post(new SyncFinishedEvent());
-//                EventBus.getDefault().unregister(this);
-
-                /*target = new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        FileOutputStream out = null;
-                        try {
-                            File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename);
-                            out = new FileOutputStream(file);
-                        } catch (FileNotFoundException e) {
-                        }
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
-                        if (counter == artists.size())
-                            EventBus.getDefault().post(new ReleasesLoadedEvent());
-                    }
-
-                    @Override
-                    public void onBitmapFailed(Drawable errorDrawable) {
-
-                    }
-
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                    }
-                };
-
-                Handler uiHandler = new Handler(Looper.getMainLooper());
-                uiHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Picasso.with(context)
-                                    .load(imageUrl)
-                                    .memoryPolicy(MemoryPolicy.NO_CACHE)
-                                    .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
-                                    .config(Bitmap.Config.RGB_565)
-                                    .error(R.drawable.no_album_image)
-                                    .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
-                                    .centerCrop()
-                                    .tag(context)
-                                    .into(target);
-                        } catch (java.lang.IllegalArgumentException e) {
-                            Picasso.with(context)
-                                    .load(R.drawable.no_album_image)
-                                    .memoryPolicy(MemoryPolicy.NO_CACHE)
-                                    .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
-                                    .config(Bitmap.Config.RGB_565)
-                                    .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
-                                    .centerCrop()
-                                    .tag(context)
-                                    .into(target);
-                        }
-                        }
-                    });*/
+                    resultForDatabase.add(new Release(entry.getReleaseGroup().getId(),
+                            entry.getTitle(), entry.getArtistCreditString(),
+                            defaultFormatter.format(map.get(key).getDate()), imageUrl, idMap.get(key)));
                 }
             }
-        }
-        else {
+
+            if (!resultForDatabase.isEmpty()) {
+                db.addReleases(resultForDatabase);
+                EventBus.getDefault().post(new ReleasesChangedEvent());
+            }
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SettingsFragment
+                    .SYNC_IN_PROGRESS, false).apply();
+            EventBus.getDefault().post(new SyncFinishedEvent());
+            }
+        } else {
             if (actionId == Constants.EXPLICIT_REFRESH) {
                 if (!Utils.isExternalStorageWritable())
                     Utils.makeExtStorToast(context);
@@ -258,29 +220,4 @@ public class RefreshReleasesJob extends Job{
     protected void onCancel() {
     }
 
-    /*@Override
-    protected boolean shouldReRunOnThrowable(Throwable throwable) {
-        return false;
-    }*/
-
-    /*@SuppressWarnings("unused")
-    public void onEventBackgroundThread(ReleasesLoadedEvent event) {
-        if (resultForDatabase != null) {
-            JobManager jobManager = App.getInstance().getJobManager();
-
-            if (!resultForDatabase.isEmpty()) {
-                DatabaseHandler db = DatabaseHandler.getInstance(context);
-                db.addReleases(resultForDatabase);
-                jobManager.addJobInBackground(new FetchReleasesJob(context));
-                jobManager.addJobInBackground(new ShowNotificationJob(context, resultForDatabase));
-            }
-            else
-                jobManager.addJobInBackground(new FetchReleasesJob(context));
-
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SettingsFragment
-                    .SYNC_IN_PROGRESS, false).apply();
-            EventBus.getDefault().post(new SyncFinishedEvent());
-            EventBus.getDefault().unregister(this);
-        }
-    }*/
 }

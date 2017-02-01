@@ -1,7 +1,6 @@
 package com.qwertyfinger.musicreleasesnotifier.jobs.artist;
 
 import android.content.Context;
-import android.os.Environment;
 import android.view.View;
 
 import com.path.android.jobqueue.Job;
@@ -15,10 +14,9 @@ import com.qwertyfinger.musicreleasesnotifier.events.release.ReleasesChangedEven
 import com.qwertyfinger.musicreleasesnotifier.misc.Constants;
 import com.qwertyfinger.musicreleasesnotifier.misc.Utils;
 
-import java.io.File;
-import java.util.List;
-
 import de.greenrobot.event.EventBus;
+
+import java.util.List;
 
 public class DeleteArtistJob extends Job {
 
@@ -41,32 +39,21 @@ public class DeleteArtistJob extends Job {
     @Override
     public void onRun() throws Throwable {
 
-        if (Utils.isExternalStorageWritable()  && !Utils.isSyncInProgress(context)) {
+        if (/*Utils.isExternalStorageWritable()  &&*/ !Utils.isSyncInProgress(context)) {
             DatabaseHandler db = DatabaseHandler.getInstance(context);
             db.deleteArtist(artist.getId());
-            List<Release> releases = db.getReleasesByArtist(artist.getId());
+            List<Release> releases = db.getReleasesByArtist(artist.getTitle());
             if (!releases.isEmpty()) {
-                db.deleteReleasesByArtist(artist.getId());
-
-                for (Release release: releases){
-                    File image = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), release.getImage());
-                    image.delete();
-                }
+                db.deleteReleasesByArtist(artist.getTitle());
 
                 EventBus.getDefault().post(new ReleasesChangedEvent());
             }
-
-            File image = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), artist.getImage());
-            image.delete();
 
             EventBus.getDefault().post(new ArtistDeletedEvent(view, artist));
             if (db.getArtistsCount() == 0)
                 EventBus.getDefault().post(new NoArtistsEvent());
         }
         else {
-            if (!Utils.isExternalStorageWritable())
-                Utils.makeExtStorToast(context);
-            if (Utils.isSyncInProgress(context))
                 Utils.makeSyncToast(context);
         }
     }

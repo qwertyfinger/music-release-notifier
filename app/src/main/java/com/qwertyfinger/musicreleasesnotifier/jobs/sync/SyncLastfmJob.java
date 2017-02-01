@@ -44,11 +44,11 @@ public class SyncLastfmJob extends Job {
 
     @Override
     public void onRun() throws Throwable {
-        if (!Utils.isSyncInProgress(context) && Utils.isExternalStorageWritable() && Utils.isConnected(context)) {
+        if (!Utils.isSyncInProgress(context) /*&& Utils.isExternalStorageWritable()*/ && Utils.isConnected(context)) {
             EventBus.getDefault().post(new SyncInProgressEvent());
 
             PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SettingsFragment.SYNC_IN_PROGRESS,
-                    true).commit();
+                    true).apply();
             Caller.getInstance().setUserAgent(Constants.LASTFM_USER_AGENT);
             Caller.getInstance().setCache(null);
 
@@ -74,7 +74,7 @@ public class SyncLastfmJob extends Job {
                 if (finalArtists.size() > 0) {
                     EventBus.getDefault().register(this);
                     List<com.qwertyfinger.musicreleasesnotifier.entities.Artist> partList = new ArrayList<>();
-                    for (int k = 0; k < 50; k++) {
+                    for (int k = 0; k < finalArtists.size(); k++) {
                         if (i > finalArtists.size()) {
                             EventBus.getDefault().unregister(this);
                             break;
@@ -88,8 +88,6 @@ public class SyncLastfmJob extends Job {
         }
         else {
             if (actionId == Constants.EXPLICIT_SYNC) {
-                if (!Utils.isExternalStorageWritable())
-                    Utils.makeExtStorToast(context);
                 if (!Utils.isConnected(context))
                     Utils.makeInternetToast(context);
                 if (Utils.isSyncInProgress(context))

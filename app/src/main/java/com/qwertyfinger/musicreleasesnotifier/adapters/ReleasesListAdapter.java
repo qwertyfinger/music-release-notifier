@@ -1,7 +1,7 @@
 package com.qwertyfinger.musicreleasesnotifier.adapters;
 
 import android.content.Context;
-import android.os.Environment;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,18 +12,16 @@ import android.widget.TextView;
 import com.qwertyfinger.musicreleasesnotifier.R;
 import com.qwertyfinger.musicreleasesnotifier.entities.Release;
 import com.qwertyfinger.musicreleasesnotifier.misc.Utils;
-import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class ReleasesListAdapter extends ArrayAdapter<Release> implements StickyListHeadersAdapter {
 
@@ -69,24 +67,24 @@ public class ReleasesListAdapter extends ArrayAdapter<Release> implements Sticky
         holder.artist.setText("by " + release.getArtist());
         holder.date.setText(release.getDate());
 
-        if (Utils.isExternalStorageReadable()) {
-            File thumbnail = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), release.getImage());
 
+        try {
             Picasso.with(getContext())
-                    .load(thumbnail)
-                    .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
+                    .load(release.getImage())
+                    .config(Bitmap.Config.RGB_565)
+                    .centerCrop()
+                    .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size)
                     .error(R.drawable.no_album_image)
                     .tag(getContext())
                     .into(holder.thumbnail);
-        }
-        else {
+        } catch (Exception e) {
             Picasso.with(getContext())
                     .load(R.drawable.no_album_image)
-                    .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
-                    .tag(getContext())
+                    .config(Bitmap.Config.RGB_565)
+                    .centerCrop()
+                    .resizeDimen(R.dimen.search_result_list_image_size, R.dimen.search_result_list_image_size).tag(getContext())
                     .into(holder.thumbnail);
         }
-
         return convertView;
     }
 

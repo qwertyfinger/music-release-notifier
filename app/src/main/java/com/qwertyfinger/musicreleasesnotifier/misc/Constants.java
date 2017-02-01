@@ -11,8 +11,8 @@ public class Constants {
     public static final int EXPLICIT_SYNC = 0;
     public static final int SCHEDULED_SYNC = 1;
 
-//    public static final int ARTIST_USER_ADD = 0;
-//    public static final int ARTIST_SYNC_ADD = 1;
+    public static final int ARTIST_USER_ADD = 0;
+    public static final int ARTIST_SYNC_ADD = 1;
 
     public static final int JOB_PRIORITY_LOW = 1;
     public static final int JOB_PRIORITY_MEDIUM = 2;

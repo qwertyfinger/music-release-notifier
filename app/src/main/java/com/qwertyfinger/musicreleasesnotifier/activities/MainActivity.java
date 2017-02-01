@@ -60,21 +60,9 @@ public class MainActivity extends AppCompatActivity {
 
         EventBus.getDefault().register(this);
 
-        App.firstLoad = false;
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
-
-//       encryption key generation, unused for now
-        /*File file = new File(getFilesDir(), "spaceOdyssey");
-        if (!file.exists()) {
-            try {
-                Utils.generateKey(this);
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            }
-        }*/
 
         setContentView(R.layout.activity_main);
 
@@ -151,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        App.firstLoad = true;
         EventBus.getDefault().unregister(this);
     }
 

@@ -40,7 +40,7 @@ public class Artist implements Parcelable {
         if (object == this) return true;
         Artist other = (Artist) object;
 
-        if (id.equals(other.id) && title.equals(other.title) && image.equals(other.image))
+        if (id.equals(other.id))
             return true;
 
         return false;

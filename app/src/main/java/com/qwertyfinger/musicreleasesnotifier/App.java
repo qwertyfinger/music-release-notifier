@@ -26,7 +26,7 @@ public class App extends Application{
     private static App sInstance;
     private JobManager jobManager;
     private DeezerConnect deezerConnect;
-    public static boolean firstLoad = true;
+//    public static boolean firstLoad = true;
     public static Random random = new Random();
 
     public static App getInstance() {

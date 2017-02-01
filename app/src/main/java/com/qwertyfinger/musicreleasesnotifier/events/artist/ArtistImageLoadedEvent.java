@@ -1,3 +1,4 @@
+/*
 package com.qwertyfinger.musicreleasesnotifier.events.artist;
 
 import android.view.View;
@@ -13,3 +14,4 @@ public class ArtistImageLoadedEvent {
         return view;
     }
 }
+*/

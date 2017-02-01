@@ -9,8 +9,6 @@ public class ArtistDeletedEvent {
     private View view;
     private Artist artist;
 
-    public ArtistDeletedEvent(){}
-
     public ArtistDeletedEvent(View view, Artist artist){
         this.view = view;
         this.artist = artist;

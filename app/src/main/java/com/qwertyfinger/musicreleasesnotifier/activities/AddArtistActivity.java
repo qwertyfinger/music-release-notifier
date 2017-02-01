@@ -40,10 +40,10 @@ import com.qwertyfinger.musicreleasesnotifier.misc.Constants;
 import com.qwertyfinger.musicreleasesnotifier.misc.ListScrollListener;
 import com.qwertyfinger.musicreleasesnotifier.misc.Utils;
 
+import de.greenrobot.event.EventBus;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import de.greenrobot.event.EventBus;
 
 public class AddArtistActivity extends AppCompatActivity{
 
@@ -180,7 +180,7 @@ public class AddArtistActivity extends AppCompatActivity{
 
                 if (addedArtists != null) {
                     if (!addedArtists.isEmpty()) {
-                        if (!App.firstLoad)
+//                        if (!App.firstLoad)
                             jobManager.addJobInBackground(new FetchArtistsJob(activity));
                         jobManager.addJobInBackground(new RefreshReleasesJob(activity, Constants.AFTER_ADDING_REFRESH, addedArtists));
                     }
