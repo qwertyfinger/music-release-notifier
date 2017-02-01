@@ -12,6 +12,7 @@ import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasesnotifier.App;
+import com.qwertyfinger.musicreleasesnotifier.BuildConfig;
 import com.qwertyfinger.musicreleasesnotifier.R;
 import com.qwertyfinger.musicreleasesnotifier.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasesnotifier.entities.Artist;
@@ -28,6 +29,11 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import de.greenrobot.event.EventBus;
+import de.umass.lastfm.Album;
+import de.umass.lastfm.Caller;
+import de.umass.lastfm.ImageSize;
+
 import org.musicbrainz.model.entity.ReleaseWs2;
 import org.musicbrainz.model.searchresult.ReleaseResultWs2;
 
@@ -41,11 +47,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import de.greenrobot.event.EventBus;
-import de.umass.lastfm.Album;
-import de.umass.lastfm.Caller;
-import de.umass.lastfm.ImageSize;
 
 public class RefreshReleasesJob extends Job{
 
@@ -173,7 +174,7 @@ public class RefreshReleasesJob extends Job{
                 String key = iterator.next();
                 ReleaseWs2 entry = map.get(key);
 
-                Album album = Album.getInfo(entry.getArtistCreditString(), entry.getTitle(), Constants.LASTFM_API_KEY);
+                Album album = Album.getInfo(entry.getArtistCreditString(), entry.getTitle(), BuildConfig.LAST_FM_API_KEY);
                 final String imageUrl = album.getImageURL(ImageSize.EXTRALARGE);
                 final String filename = entry.getReleaseGroup().getId() + ".jpg";
                 final int counter = i;

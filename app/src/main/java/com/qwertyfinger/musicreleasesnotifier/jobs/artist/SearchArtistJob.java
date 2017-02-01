@@ -2,19 +2,20 @@ package com.qwertyfinger.musicreleasesnotifier.jobs.artist;
 
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
+import com.qwertyfinger.musicreleasesnotifier.BuildConfig;
 import com.qwertyfinger.musicreleasesnotifier.events.ReleaseAdapterEvent;
 import com.qwertyfinger.musicreleasesnotifier.events.search.SearchQueryEvent;
 import com.qwertyfinger.musicreleasesnotifier.events.search.SearchingEvent;
 import com.qwertyfinger.musicreleasesnotifier.misc.Constants;
 import com.qwertyfinger.musicreleasesnotifier.misc.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.greenrobot.event.EventBus;
 import de.umass.lastfm.Artist;
 import de.umass.lastfm.Caller;
 import de.umass.lastfm.ImageSize;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SearchArtistJob extends Job {
 
@@ -37,7 +38,7 @@ public class SearchArtistJob extends Job {
         Caller.getInstance().setCache(null);
 
         List<com.qwertyfinger.musicreleasesnotifier.entities.Artist> finalArtists = new ArrayList<>();
-        List<Artist> artists = (ArrayList<Artist>) Artist.search(query, Constants.LASTFM_API_KEY);
+        List<Artist> artists = (ArrayList<Artist>) Artist.search(query, BuildConfig.LAST_FM_API_KEY);
 
         for (Artist artist: artists){
             String id = artist.getMbid();

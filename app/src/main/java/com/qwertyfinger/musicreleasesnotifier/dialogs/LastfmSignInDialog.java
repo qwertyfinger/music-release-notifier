@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasesnotifier.App;
+import com.qwertyfinger.musicreleasesnotifier.BuildConfig;
 import com.qwertyfinger.musicreleasesnotifier.R;
 import com.qwertyfinger.musicreleasesnotifier.events.lastfm.InvalidThresholdEvent;
 import com.qwertyfinger.musicreleasesnotifier.events.lastfm.InvalidUsernameEvent;
@@ -24,11 +25,11 @@ import com.qwertyfinger.musicreleasesnotifier.fragments.SettingsFragment;
 import com.qwertyfinger.musicreleasesnotifier.misc.Constants;
 import com.qwertyfinger.musicreleasesnotifier.misc.Utils;
 
-import java.lang.reflect.Field;
-
 import de.greenrobot.event.EventBus;
 import de.umass.lastfm.Caller;
 import de.umass.lastfm.User;
+
+import java.lang.reflect.Field;
 
 public class LastfmSignInDialog extends DialogPreference {
 
@@ -119,7 +120,7 @@ public class LastfmSignInDialog extends DialogPreference {
 
             @Override
             public void onRun() throws Throwable {
-                User user = User.getInfo(username.getText().toString(), Constants.LASTFM_API_KEY);
+                User user = User.getInfo(username.getText().toString(), BuildConfig.LAST_FM_API_KEY);
 
                 int thresholdInt;
                 if (threshold.getText().toString().equals(""))

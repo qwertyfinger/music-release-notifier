@@ -51,7 +51,7 @@ public class App extends Application{
     }
 
     private void configureDeezerConnect() {
-        deezerConnect = new DeezerConnect(Constants.DEEZER_APP_ID);
+        deezerConnect = new DeezerConnect(BuildConfig.DEEZER_APP_ID);
         SessionStore sessionStore = new SessionStore();
         sessionStore.restore(deezerConnect, getApplicationContext());
     }
@@ -94,7 +94,7 @@ public class App extends Application{
 
         for (com.deezer.sdk.model.Artist deezerArtist: event.getArtists()) {
             List<de.umass.lastfm.Artist> lastfmArtists = (ArrayList<de.umass.lastfm.Artist>)
-                    de.umass.lastfm.Artist.search(deezerArtist.getName(), Constants.LASTFM_API_KEY);
+                    de.umass.lastfm.Artist.search(deezerArtist.getName(), BuildConfig.LAST_FM_API_KEY);
 
             for (de.umass.lastfm.Artist lastfmArtist: lastfmArtists){
                 if (!lastfmArtist.getName().equalsIgnoreCase(deezerArtist.getName())

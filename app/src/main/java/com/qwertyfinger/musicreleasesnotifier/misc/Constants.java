@@ -1,9 +1,6 @@
 package com.qwertyfinger.musicreleasesnotifier.misc;
 
 public class Constants {
-    public static final String ***REMOVED*** = "***REMOVED***";
-    public static final String DEEZER_APP_ID = "***REMOVED***";
-
     public static final String JOB_SYNC_TAG = "sync";
 
     public static final int EXPLICIT_REFRESH = 0;
@@ -25,7 +22,7 @@ public class Constants {
     public static final String JOB_GROUP_DATABASE = "database";
     public static final String JOB_GROUP_SYNC = "sync";
 
-    public static final String LASTFM_USER_AGENT = "Music Release Tracker / Andriy Chubko (donandrino@gmail.com)";
+    public static final String LASTFM_USER_AGENT = "Music Release Notifier / Andriy Chubko (andriy.chubko.q@gmail.com)";
 
     public static final String TYPE_ALBUM = "album";
 //    public static final String TYPE_EP = "ep";

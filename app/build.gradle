@@ -23,11 +23,13 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "0.1"
+        buildConfigField "String", "LAST_FM_API_KEY", LAST_FM_API_KEY
+        buildConfigField "String", "DEEZER_APP_ID", DEEZER_APP_ID
     }
 
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
+//            applicationIdSuffix ".debug"
         }
         release {
             minifyEnabled true

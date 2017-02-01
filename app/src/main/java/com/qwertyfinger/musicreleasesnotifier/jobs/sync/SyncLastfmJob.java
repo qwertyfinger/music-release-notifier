@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasesnotifier.App;
+import com.qwertyfinger.musicreleasesnotifier.BuildConfig;
 import com.qwertyfinger.musicreleasesnotifier.events.sync.SyncFinishedEvent;
 import com.qwertyfinger.musicreleasesnotifier.events.sync.SyncInProgressEvent;
 import com.qwertyfinger.musicreleasesnotifier.fragments.SettingsFragment;
@@ -13,15 +14,15 @@ import com.qwertyfinger.musicreleasesnotifier.jobs.artist.AddArtistsJob;
 import com.qwertyfinger.musicreleasesnotifier.misc.Constants;
 import com.qwertyfinger.musicreleasesnotifier.misc.Utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import de.greenrobot.event.EventBus;
 import de.umass.lastfm.Artist;
 import de.umass.lastfm.Caller;
 import de.umass.lastfm.ImageSize;
 import de.umass.lastfm.Library;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class SyncLastfmJob extends Job {
 
@@ -54,7 +55,7 @@ public class SyncLastfmJob extends Job {
             String username = PreferenceManager.getDefaultSharedPreferences(context).getString(SettingsFragment.LAST_FM, "");
             int threshold = PreferenceManager.getDefaultSharedPreferences(context).getInt(SettingsFragment.LAST_FM_THRESHOLD, 0);
 
-            Collection<Artist> lastfmArtists = Library.getAllArtists(username, Constants.LASTFM_API_KEY);
+            Collection<Artist> lastfmArtists = Library.getAllArtists(username, BuildConfig.LAST_FM_API_KEY);
             if (lastfmArtists.size() > 0) {
                 finalArtists = new ArrayList<>();
 
