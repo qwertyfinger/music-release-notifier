@@ -1,63 +1,47 @@
 package com.qwertyfinger.musicreleasesnotifier.jobs.artist;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.view.View;
 
 import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
-import com.qwertyfinger.musicreleasesnotifier.App;
-import com.qwertyfinger.musicreleasesnotifier.R;
 import com.qwertyfinger.musicreleasesnotifier.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasesnotifier.entities.Artist;
-import com.qwertyfinger.musicreleasesnotifier.events.artist.ArtistAddedEvent;
 import com.qwertyfinger.musicreleasesnotifier.events.artist.ArtistLoadedEvent;
-import com.qwertyfinger.musicreleasesnotifier.events.artist.ArtistsChangedEvent;
 import com.qwertyfinger.musicreleasesnotifier.events.sync.SyncFinishedEvent;
 import com.qwertyfinger.musicreleasesnotifier.fragments.SettingsFragment;
-import com.qwertyfinger.musicreleasesnotifier.jobs.release.RefreshReleasesJob;
 import com.qwertyfinger.musicreleasesnotifier.misc.Constants;
 import com.qwertyfinger.musicreleasesnotifier.misc.Utils;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import de.greenrobot.event.EventBus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddArtistsJob extends Job{
 
     private Context context;
-    private Target target[];
-    private final View view;
+//    private Target target[];
+//    private final View view;
     private List<Artist> artists;
-    private int actionId;
+//    private int actionId;
     private List<Artist> finalArtists;
 
     public AddArtistsJob(Context c, List<Artist> artists, View view) {
         super(new Params(Constants.JOB_PRIORITY_LOW).groupBy(Constants.JOB_GROUP_DATABASE).addTags(Constants.JOB_SYNC_TAG));
         this.context = c;
         this.artists = artists;
-        this.view = view;
-        actionId = Constants.ARTIST_USER_ADD;
+//        this.view = view;
+//        actionId = Constants.ARTIST_USER_ADD;
     }
 
     public AddArtistsJob(Context c, List<Artist> artists) {
         super(new Params(Constants.JOB_PRIORITY_LOW).groupBy(Constants.JOB_GROUP_DATABASE).addTags(Constants.JOB_SYNC_TAG));
         this.context = c;
         this.artists = artists;
-        actionId = Constants.ARTIST_SYNC_ADD;
-        this.view = null;
+//        actionId = Constants.ARTIST_SYNC_ADD;
+//        this.view = null;
     }
 
     @Override
@@ -70,22 +54,23 @@ public class AddArtistsJob extends Job{
 
         if (Utils.isExternalStorageWritable() && Utils.isConnected(context)) {
 
-            target = new Target[artists.size()];
-            EventBus.getDefault().register(this);
+//            target = new Target[artists.size()];
+//            EventBus.getDefault().register(this);
 
             final DatabaseHandler db = DatabaseHandler.getInstance(context);
 
             finalArtists = new ArrayList<>();
-            int counter = 0;
+//            int counter = 0;
             for (final Artist artist : artists) {
                 if (!db.isArtistAdded(artist.getId()) && !isCancelled()) {
 
                     final String imageUrl = artist.getImage();
-                    final String filename = artist.getId() + ".jpg";
+//                    final String filename = artist.getId() + ".jpg";
 
-                    finalArtists.add(new Artist(artist.getId(), artist.getTitle(), filename));
+                    finalArtists.add(new Artist(artist.getId(), artist.getTitle(), imageUrl));
+                    EventBus.getDefault().post(new ArtistLoadedEvent());
 
-                    target[counter] = new Target() {
+                    /*target[counter] = new Target() {
                         @Override
                         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                             FileOutputStream out = null;
@@ -138,39 +123,55 @@ public class AddArtistsJob extends Job{
                             }
                         }
                     });
-                    counter++;
+                    counter++;*/
 
                 }
                 if (finalArtists.size() == 0) {
                     PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SettingsFragment
-                            .SYNC_IN_PROGRESS, false).commit();
+                            .SYNC_IN_PROGRESS, false).apply();
                     EventBus.getDefault().post(new SyncFinishedEvent());
                 }
-            }
+
+                /*if (actionId == Constants.ARTIST_USER_ADD) {
+                    List<Artist> list = new ArrayList<>(1);
+                    list.add(finalArtists.get(0));
+                    DatabaseHandler.getInstance(context).addArtists(finalArtists);
+                    EventBus.getDefault().post(new ArtistAddedEvent(finalArtists.get(0), view));
+                    EventBus.getDefault().unregister(this);
+                }*/
+//                else {
+//                    counter++;
+//                    if (counter == finalArtists.size()) {
+                DatabaseHandler.getInstance(context).addArtists(finalArtists);
+
+//                EventBus.getDefault().post(new ArtistsChangedEvent(finalArtists));
+//                EventBus.getDefault().unregister(this);
+                    }
+//                }
         } else {
             if (!Utils.isExternalStorageWritable())
                 Utils.makeExtStorToast(context);
             if (!Utils.isConnected(context))
                 Utils.makeInternetToast(context);
-            if (EventBus.getDefault().isRegistered(this))
-                EventBus.getDefault().unregister(this);
+            /*if (EventBus.getDefault().isRegistered(this))
+                EventBus.getDefault().unregister(this);*/
         }
     }
 
     @Override
     protected void onCancel() {
-        if (EventBus.getDefault().isRegistered(this))
-            EventBus.getDefault().unregister(this);
+//        if (EventBus.getDefault().isRegistered(this))
+//            EventBus.getDefault().unregister(this);
     }
 
-    @Override
+    /*@Override
     protected boolean shouldReRunOnThrowable(Throwable throwable) {
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this);
         return false;
-    }
+    }*/
 
-    private int counter;
+   /* private int counter;
     @SuppressWarnings("unused")
     public void onEvent(ArtistLoadedEvent event) {
         if (actionId == Constants.ARTIST_USER_ADD) {
@@ -197,5 +198,5 @@ public class AddArtistsJob extends Job{
                 EventBus.getDefault().unregister(this);
             }
         }
-    }
+    }*/
 }

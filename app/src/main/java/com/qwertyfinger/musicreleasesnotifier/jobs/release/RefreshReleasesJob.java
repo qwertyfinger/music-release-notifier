@@ -1,11 +1,6 @@
 package com.qwertyfinger.musicreleasesnotifier.jobs.release;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 
 import com.path.android.jobqueue.Job;
@@ -13,20 +8,15 @@ import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasesnotifier.App;
 import com.qwertyfinger.musicreleasesnotifier.BuildConfig;
-import com.qwertyfinger.musicreleasesnotifier.R;
 import com.qwertyfinger.musicreleasesnotifier.database.DatabaseHandler;
 import com.qwertyfinger.musicreleasesnotifier.entities.Artist;
 import com.qwertyfinger.musicreleasesnotifier.entities.Release;
 import com.qwertyfinger.musicreleasesnotifier.events.artist.NoArtistsEvent;
-import com.qwertyfinger.musicreleasesnotifier.events.release.ReleasesLoadedEvent;
 import com.qwertyfinger.musicreleasesnotifier.events.sync.SyncFinishedEvent;
 import com.qwertyfinger.musicreleasesnotifier.events.sync.SyncInProgressEvent;
 import com.qwertyfinger.musicreleasesnotifier.fragments.SettingsFragment;
 import com.qwertyfinger.musicreleasesnotifier.misc.Constants;
 import com.qwertyfinger.musicreleasesnotifier.misc.Utils;
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import de.greenrobot.event.EventBus;
@@ -37,9 +27,6 @@ import de.umass.lastfm.ImageSize;
 import org.musicbrainz.model.entity.ReleaseWs2;
 import org.musicbrainz.model.searchresult.ReleaseResultWs2;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -53,7 +40,7 @@ public class RefreshReleasesJob extends Job{
     private final Context context;
     private final int actionId;
     private List<Artist> addedArtists;
-    private Target target;
+//    private Target target;
     private final List<Release> resultForDatabase = new ArrayList<>();
 
     public RefreshReleasesJob(Context context, int actionId) {
@@ -95,9 +82,9 @@ public class RefreshReleasesJob extends Job{
             EventBus.getDefault().post(new SyncInProgressEvent());
 
             PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SettingsFragment.SYNC_IN_PROGRESS,
-                    true).commit();
+                    true).apply();
 
-            EventBus.getDefault().register(this);
+//            EventBus.getDefault().register(this);
 
             final List<Artist> artists;
             if (addedArtists != null)
@@ -128,9 +115,9 @@ public class RefreshReleasesJob extends Job{
             int year = Calendar.getInstance().get(Calendar.YEAR);
             org.musicbrainz.controller.Release release = new org.musicbrainz.controller.Release();
 
-            release.search(sb + " AND primarytype:album AND status:official AND (date:" + (year++) + "-??-?? || date:"
-                    + (year++)
-                    + "-??-?? || date:" + (year) + "-??-??)");
+            release.search(sb + " AND primarytype:album AND status:official AND (date:" + (year) + "-??-?? || date:"
+                    + (++year)
+                    + "-??-?? || date:" + (++year) + "-??-??)");
             List<ReleaseResultWs2> results = release.getFullSearchResultList();
 
             for (ReleaseResultWs2 entry : results) {
@@ -176,16 +163,30 @@ public class RefreshReleasesJob extends Job{
 
                 Album album = Album.getInfo(entry.getArtistCreditString(), entry.getTitle(), BuildConfig.LAST_FM_API_KEY);
                 final String imageUrl = album.getImageURL(ImageSize.EXTRALARGE);
-                final String filename = entry.getReleaseGroup().getId() + ".jpg";
-                final int counter = i;
+//                final int counter = i;
 
                 DateFormat defaultFormatter = DateFormat.getDateInstance(DateFormat.LONG);
 
                 resultForDatabase.add(new Release(entry.getReleaseGroup().getId(),
                         entry.getTitle(), entry.getArtistCreditString(),
-                        defaultFormatter.format(map.get(key).getDate()), filename, idMap.get(key)));
+                        defaultFormatter.format(map.get(key).getDate()), imageUrl, idMap.get(key)));
 
-                target = new Target() {
+                JobManager jobManager = App.getInstance().getJobManager();
+
+                if (!resultForDatabase.isEmpty()) {
+                    db.addReleases(resultForDatabase);
+                    jobManager.addJobInBackground(new FetchReleasesJob(context));
+                    jobManager.addJobInBackground(new ShowNotificationJob(context, resultForDatabase));
+                }
+                else
+                    jobManager.addJobInBackground(new FetchReleasesJob(context));
+
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SettingsFragment
+                        .SYNC_IN_PROGRESS, false).apply();
+                EventBus.getDefault().post(new SyncFinishedEvent());
+//                EventBus.getDefault().unregister(this);
+
+                /*target = new Target() {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                         FileOutputStream out = null;
@@ -237,7 +238,7 @@ public class RefreshReleasesJob extends Job{
                                     .into(target);
                         }
                         }
-                    });
+                    });*/
                 }
             }
         }
@@ -257,12 +258,12 @@ public class RefreshReleasesJob extends Job{
     protected void onCancel() {
     }
 
-    @Override
+    /*@Override
     protected boolean shouldReRunOnThrowable(Throwable throwable) {
         return false;
-    }
+    }*/
 
-    @SuppressWarnings("unused")
+    /*@SuppressWarnings("unused")
     public void onEventBackgroundThread(ReleasesLoadedEvent event) {
         if (resultForDatabase != null) {
             JobManager jobManager = App.getInstance().getJobManager();
@@ -277,9 +278,9 @@ public class RefreshReleasesJob extends Job{
                 jobManager.addJobInBackground(new FetchReleasesJob(context));
 
             PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SettingsFragment
-                    .SYNC_IN_PROGRESS, false).commit();
+                    .SYNC_IN_PROGRESS, false).apply();
             EventBus.getDefault().post(new SyncFinishedEvent());
             EventBus.getDefault().unregister(this);
         }
-    }
+    }*/
 }

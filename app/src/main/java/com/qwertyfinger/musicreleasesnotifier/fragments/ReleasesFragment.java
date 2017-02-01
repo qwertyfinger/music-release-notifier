@@ -21,13 +21,16 @@ import com.qwertyfinger.musicreleasesnotifier.events.release.NoReleasesEvent;
 import com.qwertyfinger.musicreleasesnotifier.events.release.ReleasesChangedEvent;
 import com.qwertyfinger.musicreleasesnotifier.events.release.ReleasesFetchedEvent;
 import com.qwertyfinger.musicreleasesnotifier.jobs.release.FetchReleasesJob;
+import com.qwertyfinger.musicreleasesnotifier.jobs.release.RefreshReleasesJob;
+import com.qwertyfinger.musicreleasesnotifier.misc.Constants;
 import com.qwertyfinger.musicreleasesnotifier.misc.ListScrollListener;
+
+import de.greenrobot.event.EventBus;
+
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import de.greenrobot.event.EventBus;
-import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 public class ReleasesFragment extends Fragment {
 
@@ -134,6 +137,8 @@ public class ReleasesFragment extends Fragment {
         mNoArtists.setVisibility(View.GONE);
         if (DatabaseHandler.getInstance(getActivity()).getReleasesCount() == 0)
             mNoReleases.setVisibility(View.VISIBLE);
+        App.getInstance().getJobManager().addJobInBackground(new RefreshReleasesJob(getContext(), Constants
+                .AFTER_SYNC_REFRESH, event.getArtists()));
     }
 
     @SuppressWarnings("unused")

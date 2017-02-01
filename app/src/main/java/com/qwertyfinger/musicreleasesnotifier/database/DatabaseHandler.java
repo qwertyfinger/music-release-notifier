@@ -9,6 +9,9 @@ import android.database.sqlite.SQLiteStatement;
 
 import com.qwertyfinger.musicreleasesnotifier.entities.Artist;
 import com.qwertyfinger.musicreleasesnotifier.entities.Release;
+import com.qwertyfinger.musicreleasesnotifier.events.artist.ArtistsChangedEvent;
+
+import de.greenrobot.event.EventBus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -239,6 +242,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
             }
 
             db.setTransactionSuccessful();
+            EventBus.getDefault().post(new ArtistsChangedEvent(artists));
         }
         catch (Exception e) {}
         finally {
