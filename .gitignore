@@ -4,3 +4,13 @@
 /.idea/libraries
 .DS_Store
 /build
+.idea/encodings.xml
+.idea/findbugs-idea.xml
+.idea/runConfigurations.xml
+app/app-release.apk
+app/class_files.txt
+app/mapping.txt
+app/seeds.txt
+app/unused.txt
+projectFilesBackup/
+keystore.properties

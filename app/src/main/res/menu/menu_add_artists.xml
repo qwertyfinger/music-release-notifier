@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.qwertyfinger.musicreleasetracker.activities.AddArtistActivity">
+    tools:context="com.qwertyfinger.musicreleasesnotifier.activities.AddArtistActivity">
     <item android:id="@+id/subscriptions_search"
         android:icon="@drawable/ic_action_search"
         android:title="@string/search_hint"

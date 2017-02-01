@@ -1,0 +1,4 @@
+package com.qwertyfinger.musicreleasesnotifier.events.artist;
+
+public class ArtistExistsEvent {
+}

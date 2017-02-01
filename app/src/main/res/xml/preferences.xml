@@ -33,14 +33,14 @@
         android:entryValues="@array/notifications_values"
         android:defaultValue="@array/notifications_default_value" />
 
-    <com.qwertyfinger.musicreleasetracker.dialogs.LastfmSignInDialog
+    <com.qwertyfinger.musicreleasesnotifier.dialogs.LastfmSignInDialog
         android:key="last_fm"
         android:title="@string/lastfm"
         android:dialogTitle="@string/lastfm_dialog"
         android:dialogLayout="@layout/lastfm_dialog"
         android:defaultValue=" "/>
 
-    <com.qwertyfinger.musicreleasetracker.dialogs.DeezerSignInDialog
+    <com.qwertyfinger.musicreleasesnotifier.dialogs.DeezerSignInDialog
         android:key="deezer"
         android:title="@string/deezer"
         android:defaultValue="false"

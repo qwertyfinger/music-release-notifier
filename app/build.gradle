@@ -1,26 +1,33 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    def keystorePropertiesFile = rootProject.file("keystore.properties")
+    def keystoreProperties = new Properties()
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
     signingConfigs {
-        config {
-            keyAlias 'MRTkey'
-            keyPassword '***REMOVED*** '
-            storeFile file('C:/Users/qwertyfinger/Google Drive/develop/android studio/keystore/keystore.jks')
-            storePassword '***REMOVED*** '
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
         }
     }
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "com.qwertyfinger.musicreleasetracker"
-        minSdkVersion 14
-        targetSdkVersion 23
+        applicationId "com.qwertyfinger.musicreleasesnotifier"
+        minSdkVersion 15
+        targetSdkVersion 25
         versionCode 1
-        versionName "1.0"
+        versionName "0.1"
     }
+
     buildTypes {
         debug {
-            debuggable true
+            applicationIdSuffix ".debug"
         }
         release {
             minifyEnabled true
@@ -70,14 +77,15 @@ repositories {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile 'junit:junit:4.12'
     compile project(':deezer-sdk')
-    compile 'com.squareup.okhttp:okhttp:2.3.0'
-    compile 'com.squareup.okio:okio:1.3.0'
-    compile 'de.greenrobot:eventbus:2.4.0'
+    compile 'com.squareup.okhttp3:okhttp:3.6.0'
+    compile 'com.squareup.okio:okio:1.11.0'
+    compile 'de.greenrobot:eventbus:2.4.1'
     compile 'se.emilsjolander:stickylistheaders:2.6.0'
-    compile 'com.birbit:android-priority-jobqueue:1.3'
-    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.birbit:android-priority-jobqueue:1.3.5'
+    compile 'com.android.support:appcompat-v7:25.1.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
-    compile 'com.android.support:support-v4:23.0.1'
+    compile 'com.android.support:support-v4:25.1.1'
 }
