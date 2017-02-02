@@ -1,6 +1,8 @@
 # Music Release Notifier
 Android application which allows you to get notifications for upcoming releases of your favourite music artists.
 
+Download apk [here](https://github.com/qwertyfinger/music-release-notifier/raw/master/music%20release%20notifier%20v0.0.1.apk).
+
 <h3>Why?</h3>
 Never again miss new albums and singles by artists you listen to!
 
