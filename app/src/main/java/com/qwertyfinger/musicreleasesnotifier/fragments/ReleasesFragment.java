@@ -3,7 +3,6 @@ package com.qwertyfinger.musicreleasesnotifier.fragments;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +40,7 @@ public class ReleasesFragment extends Fragment {
     private TextView mNoArtists;
     private Parcelable state;
     private List<Release> fetchedReleases;
+    private DatabaseHandler db;
 
 
     @Override
@@ -48,6 +48,7 @@ public class ReleasesFragment extends Fragment {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
         jobManager = App.getInstance().getJobManager();
+        db = DatabaseHandler.getInstance(getActivity());
     }
 
     @Override
@@ -59,13 +60,32 @@ public class ReleasesFragment extends Fragment {
         mNoArtists = (TextView) view.findViewById(R.id.noArtistsInRel);
         mNoReleases = (TextView) view.findViewById(R.id.noReleases);
 
+        int artistCount = db.getArtistsCount();
+        int releaseCount = db.getReleasesCount();
+
+        if (artistCount == 0){
+            mNoArtists.setVisibility(View.VISIBLE);
+            mNoReleases.setVisibility(View.GONE);
+        }
+        else {
+            if (releaseCount == 0) {
+                mNoArtists.setVisibility(View.GONE);
+                mNoReleases.setVisibility(View.VISIBLE);
+            }
+        }
+
+        if (releaseCount != 0) {
+            mNoArtists.setVisibility(View.GONE);
+            mNoReleases.setVisibility(View.GONE);
+        }
+
         mStickyList = (StickyListHeadersListView) view.findViewById(R.id.releasesList);
         mStickyList.setOnScrollListener(new ListScrollListener(getActivity()));
         mStickyList.setAreHeadersSticky(false);
 
         if (savedInstanceState != null){
 
-            if (savedInstanceState.getInt("noArtistVisibility") == View.VISIBLE)
+            /*if (DatabaseHandler.getInstance(getActivity()).getArtistsCount() == 0)
                 mNoArtists.setVisibility(View.VISIBLE);
             else
                 mNoArtists.setVisibility(View.GONE);
@@ -73,7 +93,7 @@ public class ReleasesFragment extends Fragment {
             if (savedInstanceState.getInt("noReleasesVisibility") == View.VISIBLE)
                 mNoReleases.setVisibility(View.VISIBLE);
             else
-                mNoReleases.setVisibility(View.GONE);
+                mNoReleases.setVisibility(View.GONE);*/
 
             fetchedReleases = savedInstanceState.getParcelableArrayList("fetchedList");
             if (fetchedReleases == null)
@@ -82,14 +102,12 @@ public class ReleasesFragment extends Fragment {
                 mAdapter = new ReleasesListAdapter(getActivity(), fetchedReleases);
                 mStickyList.setAdapter(mAdapter);
             }
-        }
-
-        else {
+        } else {
             fetchedReleases = new ArrayList<>();
-            if (DatabaseHandler.getInstance(getActivity()).getReleasesCount() != 0) {
+            /*if (DatabaseHandler.getInstance(getActivity()).getReleasesCount() != 0) {
                 mNoArtists.setVisibility(View.GONE);
                 mNoReleases.setVisibility(View.VISIBLE);
-            }
+            }*/
         }
 
         if (state != null)
@@ -120,11 +138,11 @@ public class ReleasesFragment extends Fragment {
         if (mStickyList != null)
             state = mStickyList.onSaveInstanceState();
 
-        if (mNoReleases != null)
+        /*if (mNoReleases != null)
             savedInstanceState.putInt("noReleasesVisibility", mNoReleases.getVisibility());
 
         if (mNoArtists != null)
-            savedInstanceState.putInt("noArtistVisibility", mNoArtists.getVisibility());
+            savedInstanceState.putInt("noArtistVisibility", mNoArtists.getVisibility());*/
 
         if (fetchedReleases != null)
             savedInstanceState.putParcelableArrayList("fetchedList", (ArrayList<Release>) fetchedReleases);
@@ -135,10 +153,13 @@ public class ReleasesFragment extends Fragment {
     @SuppressWarnings("unused")
     public void onEventMainThread(ArtistsChangedEvent event) {
         mNoArtists.setVisibility(View.GONE);
-        if (DatabaseHandler.getInstance(getActivity()).getReleasesCount() == 0)
+        if (db.getReleasesCount() == 0) {
             mNoReleases.setVisibility(View.VISIBLE);
-        App.getInstance().getJobManager().addJobInBackground(new RefreshReleasesJob(getContext(), Constants
-                .AFTER_SYNC_REFRESH, event.getArtists()));
+        }
+        if (event.getArtists() != null) {
+            App.getInstance().getJobManager().addJobInBackground(new RefreshReleasesJob(getContext(), Constants
+                    .AFTER_SYNC_REFRESH, event.getArtists()));
+        }
     }
 
     @SuppressWarnings("unused")
@@ -156,16 +177,16 @@ public class ReleasesFragment extends Fragment {
     public void onEventMainThread(ReleasesChangedEvent event) {
         jobManager.addJobInBackground(new FetchReleasesJob(getActivity()));
 
-        DatabaseHandler db = DatabaseHandler.getInstance(getActivity());
+//        DatabaseHandler db = DatabaseHandler.getInstance(getActivity());
 
-        Log.d("Reading: ", "Reading all releases..");
+        /*Log.d("Reading: ", "Reading all releases..");
         Log.d("Count: ", db.getReleasesCount()+"");
         List<Release> list = db.getAllReleases();
         for (Release release : list) {
             String log = "Id: " + release.getId() + " ,Name: " + release.getTitle() + " ,ImageUrl: " + release.getImage() + " ,Artist: "
                     + release.getArtist() + " ,Date: " + release.getDate();
             Log.d("Release: ", log);
-        }
+        }*/
     }
 
     @SuppressWarnings("unused")

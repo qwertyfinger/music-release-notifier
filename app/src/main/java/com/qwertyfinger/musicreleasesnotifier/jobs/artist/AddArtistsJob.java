@@ -51,7 +51,7 @@ public class AddArtistsJob extends Job{
     @Override
     public void onRun() throws Throwable {
 
-        if (/*Utils.isExternalStorageWritable() &&*/ Utils.isConnected(context)) {
+        if (Utils.isConnected(context)) {
 
             final DatabaseHandler db = DatabaseHandler.getInstance(context);
 
@@ -61,7 +61,6 @@ public class AddArtistsJob extends Job{
                 EventBus.getDefault().post(new SyncFinishedEvent());
             }
 
-//            int counter = 0;
             else {
                 List<Artist> finalArtists = new ArrayList<>();
 
@@ -74,12 +73,11 @@ public class AddArtistsJob extends Job{
 
                 if (actionId == Constants.ARTIST_USER_ADD) {
                     EventBus.getDefault().post(new ArtistAddedEvent(artists.get(0), view));
+                    EventBus.getDefault().post(new ArtistsChangedEvent(null));
                 } else {
                     EventBus.getDefault().post(new ArtistsChangedEvent(artists));
-
                 }
             }
-//                }
         } else {
                 Utils.makeInternetToast(context);
         }
