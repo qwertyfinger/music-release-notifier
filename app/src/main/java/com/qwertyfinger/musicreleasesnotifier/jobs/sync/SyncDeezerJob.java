@@ -18,9 +18,9 @@ import com.qwertyfinger.musicreleasesnotifier.fragments.SettingsFragment;
 import com.qwertyfinger.musicreleasesnotifier.misc.Constants;
 import com.qwertyfinger.musicreleasesnotifier.misc.Utils;
 
-import java.util.List;
-
 import de.greenrobot.event.EventBus;
+
+import java.util.List;
 
 public class SyncDeezerJob extends Job {
 
@@ -45,7 +45,7 @@ public class SyncDeezerJob extends Job {
             EventBus.getDefault().post(new SyncInProgressEvent());
 
             PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SettingsFragment.SYNC_IN_PROGRESS,
-                    true).commit();
+                    true).apply();
             RequestListener listener = new JsonRequestListener() {
                 @Override
                 public void onResult(Object result, Object o1) {
@@ -54,7 +54,7 @@ public class SyncDeezerJob extends Job {
                         EventBus.getDefault().post(new DeezerRequestFinEvent(deezerArtists));
                     else  {
                         PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SettingsFragment.SYNC_IN_PROGRESS,
-                                false).commit();
+                                false).apply();
                         EventBus.getDefault().post(new SyncFinishedEvent());
                     }
                 }

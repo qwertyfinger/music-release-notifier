@@ -7,7 +7,6 @@ import com.path.android.jobqueue.Job;
 import com.path.android.jobqueue.Params;
 import com.qwertyfinger.musicreleasesnotifier.App;
 import com.qwertyfinger.musicreleasesnotifier.BuildConfig;
-import com.qwertyfinger.musicreleasesnotifier.events.sync.SyncFinishedEvent;
 import com.qwertyfinger.musicreleasesnotifier.events.sync.SyncInProgressEvent;
 import com.qwertyfinger.musicreleasesnotifier.fragments.SettingsFragment;
 import com.qwertyfinger.musicreleasesnotifier.jobs.artist.AddArtistsJob;
@@ -44,7 +43,7 @@ public class SyncLastfmJob extends Job {
 
     @Override
     public void onRun() throws Throwable {
-        if (!Utils.isSyncInProgress(context) /*&& Utils.isExternalStorageWritable()*/ && Utils.isConnected(context)) {
+        if (!Utils.isSyncInProgress(context) && Utils.isConnected(context)) {
             EventBus.getDefault().post(new SyncInProgressEvent());
 
             PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SettingsFragment.SYNC_IN_PROGRESS,
@@ -72,7 +71,8 @@ public class SyncLastfmJob extends Job {
                 }
 
                 if (finalArtists.size() > 0) {
-                    EventBus.getDefault().register(this);
+                    App.getInstance().getJobManager().addJobInBackground(new AddArtistsJob(context, finalArtists));
+                    /*EventBus.getDefault().register(this);
                     List<com.qwertyfinger.musicreleasesnotifier.entities.Artist> partList = new ArrayList<>();
                     for (int k = 0; k < finalArtists.size(); k++) {
                         if (i > finalArtists.size()) {
@@ -82,7 +82,7 @@ public class SyncLastfmJob extends Job {
                         partList.add(finalArtists.get(i));
                         i++;
                     }
-                    App.getInstance().getJobManager().addJobInBackground(new AddArtistsJob(context, partList));
+                    App.getInstance().getJobManager().addJobInBackground(new AddArtistsJob(context, partList));*/
                 }
             }
         }
@@ -106,8 +106,8 @@ public class SyncLastfmJob extends Job {
         return false;
     }
 
-    @SuppressWarnings("unused")
-    public void onEvent(SyncFinishedEvent event) {
+    /*@SuppressWarnings("unused")
+    *//*public void onEvent(SyncFinishedEvent event) {
         List<com.qwertyfinger.musicreleasesnotifier.entities.Artist> partList = new ArrayList<>();
         for (int k = 0; k < 50; k++) {
             if (i >= finalArtists.size()) {
@@ -118,5 +118,5 @@ public class SyncLastfmJob extends Job {
             i++;
         }
         App.getInstance().getJobManager().addJobInBackground(new AddArtistsJob(context, partList));
-    }
+    }*/
 }
