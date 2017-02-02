@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MusicReleasesTracker.iml" filepath="$PROJECT_DIR$/MusicReleasesTracker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MusicReleaseNotifier.iml" filepath="$PROJECT_DIR$/MusicReleaseNotifier.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/deezer-sdk/deezer-sdk.iml" filepath="$PROJECT_DIR$/deezer-sdk/deezer-sdk.iml" />
     </modules>
