@@ -186,7 +186,6 @@ public class RefreshReleasesJob extends Job{
 
                     Album album = Album.getInfo(entry.getArtistCreditString(), entry.getTitle(), BuildConfig.LAST_FM_API_KEY);
                     final String imageUrl = album.getImageURL(ImageSize.EXTRALARGE);
-                    //                final int counter = i;
 
                     DateFormat defaultFormatter = DateFormat.getDateInstance(DateFormat.LONG);
 
