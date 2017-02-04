@@ -3,7 +3,7 @@ Android application which allows you to get notifications for upcoming releases 
 
 Download apk [here](https://github.com/qwertyfinger/music-release-notifier/raw/master/music%20release%20notifier%20v0.0.1.apk).
 
-<h3>Why?</h3>
+## Why?
 Never again miss new albums and singles by artists you listen to!
 
 Subscribe to get notifications. Synchronise library with your Last.fm and Deezer accounts.
@@ -14,18 +14,20 @@ Subscribe to get notifications. Synchronise library with your Last.fm and Deezer
  - ability to sync with Facebook and some other big platforms;
  - get detailed info about upcoming releases, select the ones you're most excited about, rate the ones you've listened to.
 
-<h3>Screenshots</h3>
+## Screenshots
 ![enter image description here](https://pp.vk.me/c836439/v836439582/33599/BkSliqWdqco.jpg)![enter image description here](https://pp.vk.me/c836439/v836439582/335a9/5B3DMRfdyFk.jpg)
 ![enter image description here](https://pp.vk.me/c836439/v836439582/335a1/CK92OtZarOA.jpg)![enter image description here](https://pp.vk.me/c836439/v836439582/33591/ysUF3fNfi4k.jpg)
 
 
-<h3>Technical side</h3>
+## Technical side
 Application codebase suffers from lack of a proper architecture and usage of not the most suitable supporting libraries. It's going to be completely rewritten in a more appropriate fashion, using MVP architecture and Reactive programming.
 
-The necessary data is available thanks to <a href="http://www.last.fm">Last.fm</a>, <a href="http://www.setlist.fm">Deezer</a> and [MusicBrainz](https://musicbrainz.org/) via their APIs.
+The necessary data is available thanks to [Last.fm](http://last.fm/)</a>, [Deezer](http://deezer.com)</a> and [MusicBrainz](https://musicbrainz.org/) via their APIs.
 
-<h3>License</h3>
+## License
 
+
+```
 MIT License
 
 Copyright (c) 2017 Andriy Chubko
@@ -46,4 +48,5 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE. 
+SOFTWARE.
+```
