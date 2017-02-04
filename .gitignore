@@ -12,4 +12,4 @@ app/unused.txt
 projectFilesBackup/
 keystore.properties
 gradle
-#gradle.properties
+gradle.properties
