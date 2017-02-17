@@ -20,6 +20,8 @@ Subscribe to get notifications. Synchronise library with your Last.fm and Deezer
 
 
 ## Technical side
+*Warning: code is not production-ready.*
+
 Application codebase suffers from lack of a proper architecture and usage of not the most suitable supporting libraries. It's going to be completely rewritten in a more appropriate fashion, using MVP architecture and Reactive programming.
 
 The necessary data is available thanks to [Last.fm](http://last.fm/)</a>, [Deezer](http://deezer.com)</a> and [MusicBrainz](https://musicbrainz.org/) via their APIs.
