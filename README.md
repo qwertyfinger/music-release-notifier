@@ -1,4 +1,4 @@
-**_Note: This project is succeeded by [Release Notifier](https://github.com/qwertyfinger/release-notifier) project_**
+**_Note: This project is succeeded by [Release Notifier](https://github.com/qwertyfinger/release-notifier)_**
 
 # Music Release Notifier
 Android application which allows you to get notifications for upcoming releases of your favourite music artists.
